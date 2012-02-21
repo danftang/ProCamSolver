@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test 1 - Camera matrix input", "Test 1 - Camera matrix input\Test 1 - Camera matrix input.vcxproj", "{83FB0A91-08BF-4A57-85E8-82A985A1D3FB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{83FB0A91-08BF-4A57-85E8-82A985A1D3FB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{83FB0A91-08BF-4A57-85E8-82A985A1D3FB}.Debug|Win32.Build.0 = Debug|Win32
+		{83FB0A91-08BF-4A57-85E8-82A985A1D3FB}.Release|Win32.ActiveCfg = Release|Win32
+		{83FB0A91-08BF-4A57-85E8-82A985A1D3FB}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
