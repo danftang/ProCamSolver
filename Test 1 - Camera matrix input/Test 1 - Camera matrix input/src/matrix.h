@@ -211,6 +211,7 @@ Matrix<DATATYPE> &Matrix<DATATYPE>::operator *=(Matrix<DATATYPE> &N) {
       (*this)[i][j]  = t[j];
     }
   }
+
   return(*this);
 }
 

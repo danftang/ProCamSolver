@@ -51,6 +51,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\src;.\src\nrlib</AdditionalIncludeDirectories>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -89,7 +90,11 @@
     <ClInclude Include="src\transformMatrix.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\FSolver.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\nrlib\svd.cpp" />
+    <ClCompile Include="src\RTSolver.cpp" />
+    <ClCompile Include="src\transformMatrix.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

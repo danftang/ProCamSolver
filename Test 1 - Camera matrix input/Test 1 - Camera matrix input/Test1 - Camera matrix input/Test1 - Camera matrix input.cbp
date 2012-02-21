@@ -20,7 +20,21 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
-		<Unit filename="main.cpp" />
+		<Unit filename="..\src\FSolver.cpp" />
+		<Unit filename="..\src\FSolver.h" />
+		<Unit filename="..\src\RTSolver.cpp" />
+		<Unit filename="..\src\RTSolver.h" />
+		<Unit filename="..\src\main.cpp" />
+		<Unit filename="..\src\matrix.h" />
+		<Unit filename="..\src\nrlib\mins.h" />
+		<Unit filename="..\src\nrlib\mins_ndim.h" />
+		<Unit filename="..\src\nrlib\nr3.h" />
+		<Unit filename="..\src\nrlib\qrdcmp.h" />
+		<Unit filename="..\src\nrlib\svd.cpp" />
+		<Unit filename="..\src\nrlib\svd.h" />
+		<Unit filename="..\src\numerical.h" />
+		<Unit filename="..\src\transformMatrix.cpp" />
+		<Unit filename="..\src\transformMatrix.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />

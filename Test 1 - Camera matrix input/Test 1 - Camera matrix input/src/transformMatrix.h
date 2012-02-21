@@ -32,9 +32,15 @@ enum matrixType {
 class transformMatrix : public Matrix<double> {
 public:
 
+#if defined(_MSC_VER)
+  //do vc++ related
+	transformMatrix(matrixType=matrixType::identity,
+		  double=0.0, double=0.0, double=0.0, double=0.0);
+#else
+  //do gcc related
   transformMatrix(matrixType=identity,
 		  double=0.0, double=0.0, double=0.0, double=0.0);
-
+#endif
 
   transformMatrix & 	operator *=(transformMatrix &);
   transformMatrix & 	operator =(const Matrix<double> &);

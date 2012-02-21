@@ -9,6 +9,18 @@
 #include "transformMatrix.h"
 
 int main() {
+#if defined(_MSC_VER)
+	//do vc++ related
+	transformMatrix	I(matrixType::identity);
+#else
+	//do gcc related
+	transformMatrix	I(identity);
+#endif
+	coord		t(3);			// translation vector
+	t[0] = 1.0f; t[1] = 0.0f; t[2] = 0.0f;
+	transformMatrix referenceRotate(yrotate, atan(0.5));
+	Matrix<double> referenceTranslate = I|t;
+
   transformMatrix 	F;
   transformMatrix 	M(intrinsic, 1.0, 1.0, 0.0, 0.0);
   transformMatrix 	MP(intrinsic, 1.0, 1.2, 0.01, 0.02);
@@ -32,11 +44,26 @@ int main() {
   P = RTSolver(F,M,MP);
 
   std::cout << std::endl;
-  std::cout << "Camera matrix is:" << std::endl;
+  std::cout << "ViewProjetion matrix estimation:" << std::endl;
   std::cout << P;
   std::cout << std::endl;
-  std::cout << "Reference camera matrix is:" << std::endl;
+
+  std::cout << "Reference Projection matrix is:" << std::endl;
   std::cout << (MP|zero);
+  std::cout << std::endl;
+
+  std::cout << "Reference Rotate matrix is:" << std::endl;
+  std::cout << referenceRotate;
+  std::cout << std::endl;
+
+  std::cout << "Reference Translate matrix is:" << std::endl;
+  std::cout << referenceTranslate;
+  std::cout << std::endl;
+
+  std::cout << "Reference ViewProjection matrix is:" << std::endl;
+  std::cout << (MP * referenceRotate * referenceTranslate);
+  std::cout << std::endl;
+
 
   return(0);
 }
