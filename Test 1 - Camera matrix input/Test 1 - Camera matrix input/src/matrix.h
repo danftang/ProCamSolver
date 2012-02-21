@@ -14,9 +14,6 @@
 #include <cmath>
 #include <new>
 #include <iostream>
-#include <vector>
-
-using namespace std;
 
 template<class DATATYPE>
 class Matrix {
@@ -29,8 +26,8 @@ public:
   int		isize() const 			{return(SIZE/cols);}
   int 		size() const		       	{return(SIZE);}
   void		resize(int, int);
-  DATATYPE *	array() 			{return(x);}
-  const DATATYPE *array() const			{return(x);}
+  DATATYPE *	array() 			{return(&x[0]);}
+  const DATATYPE *array() const			{return(&x[0]);}
   void		clear();
   void		transpose();
 
@@ -47,9 +44,9 @@ public:
   Matrix &     		operator =(double);
 
 protected:
-	vector<DATATYPE> 	x;
-	int 				cols;
-	int					SIZE;
+	std::valarray<DATATYPE> 	x;
+	int							cols;
+	int							SIZE;
 };
 
 

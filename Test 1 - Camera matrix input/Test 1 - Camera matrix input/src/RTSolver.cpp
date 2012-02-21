@@ -9,11 +9,11 @@ const double RTSolver::PI = 3.1415926535897932;
 // f  = the fundamental matrix between two views
 // m  = the intrinsic matrix of the reference camera
 // mp = the intrinsic matrix of the second camera (M')
-// 
+//
 // on construction, 'this' is set to be equal to the camera matrix of
 // the second view.
 //
-// If F is exact, we have that 
+// If F is exact, we have that
 // F = M'^{-1}RTM^{-1}
 // so, if we let r be the residual matrix:
 // r = M'^{-1}RTM^{-1} - F
@@ -35,12 +35,12 @@ const double RTSolver::PI = 3.1415926535897932;
 ///////////////////////////////////////////////////////////////////////////////
 RTSolver::RTSolver(Matrix<double> &f,
 		   Matrix<double> &m,
-		   Matrix<double> &mp) : 
+		   Matrix<double> &mp) :
   transformMatrix(camera),
   N(inverse_intrinsic, m[0][0], m[1][1], m[0][2], m[1][2]),
   NPT(inverse_intrinsic, mp[0][0], mp[1][1], mp[0][2], mp[1][2])
  {
-   transformMatrix	I(matrixType::identity);
+   transformMatrix	I(identity);
    Frprmn<RTSolver>	mySolver(*this, 1e-8);	// solver
    VecDoub 		p(6); 			// parameters for solver
    coord		t(3);			// translation vector
@@ -76,7 +76,7 @@ RTSolver::RTSolver(Matrix<double> &f,
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// return sum of squares of errors, where 
+// return sum of squares of errors, where
 //
 // e^2 = (M'^{-1T}RTM^{-1} - F).(M'^{-1T}RTM^{-1} - F)
 //
@@ -104,7 +104,7 @@ double RTSolver::operator()(VecDoub_I &p) {
 //
 // Uses the identity d(sum_n(y_n^2))/dx = sum_n(2y_n * dy_n/dx)
 //
-// and the identities d(sin(t))/dt = sin(t + PI/2) and 
+// and the identities d(sin(t))/dt = sin(t + PI/2) and
 // d(cos(t))/dt = cos(t + PI/2)
 //
 ///////////////////////////////////////////////////////////////////////////////
@@ -115,7 +115,7 @@ void RTSolver::df(VecDoub_I &p, VecDoub_O &deriv) {
    transformMatrix T_N;
    transformMatrix de_dp;
 
-   R = 	
+   R =
      transformMatrix(xrotate,p[3]) *
      transformMatrix(yrotate,p[4]) *
      transformMatrix(zrotate,p[5]);
@@ -132,20 +132,20 @@ void RTSolver::df(VecDoub_I &p, VecDoub_O &deriv) {
    de_dp = 0.0; de_dp[0][1] = -1.0; de_dp[1][0] = 1.0;
    deriv[2] = 2.0*elemental_dot_prod(e, NPT_R*de_dp*N);
 
-   de_dp = 
-     transformMatrix(xrotate,p[3] + PI/2) * 
+   de_dp =
+     transformMatrix(xrotate,p[3] + PI/2) *
      transformMatrix(yrotate,p[4]) *
      transformMatrix(zrotate,p[5]);
    deriv[3] = 2.0*elemental_dot_prod(e, NPT*de_dp*T_N);
 
-   de_dp = 
-     transformMatrix(xrotate,p[3]) * 
+   de_dp =
+     transformMatrix(xrotate,p[3]) *
      transformMatrix(yrotate,p[4] + PI/2) *
      transformMatrix(zrotate,p[5]);
    deriv[4] = 2.0*elemental_dot_prod(e, NPT*de_dp*T_N);
 
-   de_dp = 
-     transformMatrix(xrotate,p[3]) * 
+   de_dp =
+     transformMatrix(xrotate,p[3]) *
      transformMatrix(yrotate,p[4]) *
      transformMatrix(zrotate,p[5] + PI/2);
    deriv[5] = 2.0*elemental_dot_prod(e, NPT*de_dp*T_N);
@@ -157,7 +157,7 @@ void RTSolver::df(VecDoub_I &p, VecDoub_O &deriv) {
 // Returns sum_i sum_j M_{ij}N_{ij}
 //
 ///////////////////////////////////////////////////////////////////////////////
-double RTSolver::elemental_dot_prod(const Matrix<double> &M, 
+double RTSolver::elemental_dot_prod(const Matrix<double> &M,
 				    const Matrix<double> &N) {
   int i,j;
   double result;

@@ -4,9 +4,9 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "FSolver.cpp"
-#include "RTSolver.cpp"
-#include "transformMatrix.cpp"
+#include "FSolver.h"
+#include "RTSolver.h"
+#include "transformMatrix.h"
 
 int main() {
   transformMatrix 	F;
@@ -37,5 +37,6 @@ int main() {
   std::cout << std::endl;
   std::cout << "Reference camera matrix is:" << std::endl;
   std::cout << (M|zero);
+
   return(0);
 }

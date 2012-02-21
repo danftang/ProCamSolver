@@ -23,7 +23,7 @@ enum matrixType {
   xrotate,			// clockwise rotation about x-axis (left/right)
   yrotate,			// rotation about y-axis
   zrotate,			// rotation about z-axis
-  identity,			
+  identity,
   cross_prod,			// cross product matrix Mv = m x v
   camera			// camera matrix
 };
@@ -32,7 +32,7 @@ enum matrixType {
 class transformMatrix : public Matrix<double> {
 public:
 
-  transformMatrix(matrixType=matrixType::identity, 
+  transformMatrix(matrixType=identity,
 		  double=0.0, double=0.0, double=0.0, double=0.0);
 
 

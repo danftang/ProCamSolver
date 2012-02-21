@@ -41,7 +41,7 @@ void FSolver::solve(transformMatrix &F) {
 //
 // Load set of correspondences from a file in format
 // Index1 x y Index2 x' y' weight
-// 
+//
 ///////////////////////////////////////////////////////////////////////////////
 bool FSolver::load(const char *filename) {
   double 	weight;
@@ -55,7 +55,7 @@ bool FSolver::load(const char *filename) {
   while(in.peek() == '#') {
     in.ignore(1024,'\n');
   }
-  while(in >> cam_pixel[2] >> cam_pixel[0] >> cam_pixel[1] 
+  while(in >> cam_pixel[2] >> cam_pixel[0] >> cam_pixel[1]
 	   >> pro_pixel[2] >> pro_pixel[0] >> pro_pixel[1] >> weight) {
     cam_pixel[2] = 1.0;
     pro_pixel[2] = 1.0;
@@ -104,7 +104,7 @@ Doub FSolver::operator()(VecDoub_I &p) {
 // returning the result in 'deriv'.
 //
 // assumes e is up to date with p
-// 
+//
 ///////////////////////////////////////////////////////////////////////////////
 void FSolver::df(VecDoub_I &p, VecDoub_O &deriv) {
   coord		etot(3);	// total error vector
@@ -122,7 +122,7 @@ void FSolver::df(VecDoub_I &p, VecDoub_O &deriv) {
 
   for(i = 0; i<3; ++i) {
     for(j = 0; j<3; ++j) {
-      deriv[3*i+j] = 0.0; 
+      deriv[3*i+j] = 0.0;
       for(n=0; n<data_size(); ++n) {
 	deriv[3*i+j] += 2.0 * e[n] * qp[n][i] * q[n][j];
       }
@@ -157,7 +157,7 @@ coord FSolver::epipole(transformMatrix &F) {
     }
   }
   SVD	decomposition(FP);
-  FP = decomposition.nullspace();
+  FP = decomposition.nullspace(0.0);
   e[0] = FP[0][0];
   e[1] = FP[1][0];
   e[2] = FP[2][0];
