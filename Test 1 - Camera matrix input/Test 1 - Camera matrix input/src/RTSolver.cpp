@@ -40,7 +40,7 @@ RTSolver::RTSolver(Matrix<double> &f,
   N(inverse_intrinsic, m[0][0], m[1][1], m[0][2], m[1][2]),
   NPT(inverse_intrinsic, mp[0][0], mp[1][1], mp[0][2], mp[1][2])
  {
-   transformMatrix	I(matrixType::identity);
+   transformMatrix	I(identity);
    Frprmn<RTSolver>	mySolver(*this, 1e-8);	// solver
    VecDoub 		p(6); 			// parameters for solver
    coord		t(3);			// translation vector

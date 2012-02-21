@@ -32,7 +32,7 @@ enum matrixType {
 class transformMatrix : public Matrix<double> {
 public:
 
-  transformMatrix(matrixType=matrixType::identity, 
+  transformMatrix(matrixType=identity, 
 		  double=0.0, double=0.0, double=0.0, double=0.0);
 
 

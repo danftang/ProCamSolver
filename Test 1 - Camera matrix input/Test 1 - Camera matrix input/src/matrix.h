@@ -47,7 +47,6 @@ protected:
   DATATYPE * 	x;
   int 		cols;
   int		SIZE;
-  bool		allocated;
 };
 
 
@@ -59,7 +58,6 @@ protected:
 
 template<class DATATYPE>
 Matrix<DATATYPE>::Matrix() : cols(0), SIZE(0) {
-	allocated = false;
 }
 
 
@@ -67,14 +65,12 @@ template<class DATATYPE>
 Matrix<DATATYPE>::Matrix(int isize, int jsize) : cols(jsize) {
   SIZE = isize*jsize;
   x = new double [SIZE];
-  allocated = true;
 }
 
 
 template<class DATATYPE>
 Matrix<DATATYPE>::~Matrix() {
-	if (allocated)
-		delete [] x;
+  delete [] x;
 }
 
 
@@ -236,8 +232,6 @@ Matrix<DATATYPE> &Matrix<DATATYPE>::operator =(const Matrix<DATATYPE> &N) {
   for(i = 0; i<SIZE; ++i) {
     x[i] = N.x[i];
   }
-
-  return *this;
 }
 
 
@@ -251,7 +245,6 @@ Matrix<DATATYPE> &Matrix<DATATYPE>::operator =(double c) {
   for(i = 0; i<SIZE; ++i) {
     x[i] = c;
   }
-  return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
