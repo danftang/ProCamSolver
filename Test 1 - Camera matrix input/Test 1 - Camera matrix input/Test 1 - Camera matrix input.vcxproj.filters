@@ -21,49 +21,37 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\scrap\camerapos0.1\main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\scrap\camerapos0.1\RTSolver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\scrap\camerapos0.1\transformMatrix.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\scrap\camerapos0.1\FSolver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <ClInclude Include="src\nrlib\mins.h">
+      <Filter>Header Files\nrlib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nrlib\mins_ndim.h">
+      <Filter>Header Files\nrlib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nrlib\nr3.h">
+      <Filter>Header Files\nrlib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nrlib\qrdcmp.h">
+      <Filter>Header Files\nrlib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nrlib\svd.h">
+      <Filter>Header Files\nrlib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FSolver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\matrix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RTSolver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\transformMatrix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\scrap\camerapos0.1\nrlib\qrdcmp.h">
-      <Filter>Header Files\nrlib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\scrap\camerapos0.1\nrlib\svd.h">
-      <Filter>Header Files\nrlib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\scrap\camerapos0.1\nrlib\mins.h">
-      <Filter>Header Files\nrlib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\scrap\camerapos0.1\nrlib\mins_ndim.h">
-      <Filter>Header Files\nrlib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\scrap\camerapos0.1\nrlib\nr3.h">
-      <Filter>Header Files\nrlib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\scrap\camerapos0.1\matrix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\scrap\camerapos0.1\numerical.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\scrap\camerapos0.1\RTSolver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\scrap\camerapos0.1\transformMatrix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\scrap\camerapos0.1\FSolver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <ClCompile Include="src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
