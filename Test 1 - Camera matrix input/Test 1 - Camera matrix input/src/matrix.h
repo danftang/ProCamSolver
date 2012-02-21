@@ -14,6 +14,9 @@
 #include <cmath>
 #include <new>
 #include <iostream>
+#include <vector>
+
+using namespace std;
 
 template<class DATATYPE>
 class Matrix {
@@ -31,8 +34,8 @@ public:
   void		clear();
   void		transpose();
 
-  DATATYPE *		operator[](int i) 		{return(x+i*cols);}
-  const DATATYPE *	operator[](int i) const 	{return(x+i*cols);}
+  DATATYPE *		operator[](int i) 		{return(&x[i*cols]);}
+  const DATATYPE *	operator[](int i) const 	{return(&x[i*cols]);}
   const DATATYPE &	operator()(int i, int j) const	{return(x[i*cols+j]);}
   std::valarray<DATATYPE> operator *(const std::valarray<DATATYPE> &);
   Matrix  		operator *(const Matrix &);
@@ -44,9 +47,9 @@ public:
   Matrix &     		operator =(double);
 
 protected:
-  DATATYPE * 	x;
-  int 		cols;
-  int		SIZE;
+	vector<DATATYPE> 	x;
+	int 				cols;
+	int					SIZE;
 };
 
 
@@ -64,13 +67,13 @@ Matrix<DATATYPE>::Matrix() : cols(0), SIZE(0) {
 template<class DATATYPE>
 Matrix<DATATYPE>::Matrix(int isize, int jsize) : cols(jsize) {
   SIZE = isize*jsize;
-  x = new double [SIZE];
+  x.resize(SIZE);
 }
 
 
 template<class DATATYPE>
 Matrix<DATATYPE>::~Matrix() {
-  delete [] x;
+
 }
 
 
@@ -81,10 +84,9 @@ Matrix<DATATYPE>::~Matrix() {
 ///////////////////////////////////////////////////////////////////////////////
 template<class DATATYPE>
 void Matrix<DATATYPE>::resize(int isize, int jsize) {
-  delete [] x;
   cols = jsize;
   SIZE = isize*jsize;
-  x = new double [SIZE];
+  x.resize(SIZE);
 }
 
 
@@ -232,6 +234,8 @@ Matrix<DATATYPE> &Matrix<DATATYPE>::operator =(const Matrix<DATATYPE> &N) {
   for(i = 0; i<SIZE; ++i) {
     x[i] = N.x[i];
   }
+
+  return *this;
 }
 
 
@@ -245,6 +249,8 @@ Matrix<DATATYPE> &Matrix<DATATYPE>::operator =(double c) {
   for(i = 0; i<SIZE; ++i) {
     x[i] = c;
   }
+
+  return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

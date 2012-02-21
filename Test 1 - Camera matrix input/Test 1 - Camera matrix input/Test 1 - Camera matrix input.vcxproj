@@ -78,22 +78,18 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\scrap\camerapos0.1\FSolver.cpp" />
-    <ClCompile Include="..\..\..\..\scrap\camerapos0.1\main.cpp" />
-    <ClCompile Include="..\..\..\..\scrap\camerapos0.1\RTSolver.cpp" />
-    <ClCompile Include="..\..\..\..\scrap\camerapos0.1\transformMatrix.cpp" />
+    <ClInclude Include="src\FSolver.h" />
+    <ClInclude Include="src\matrix.h" />
+    <ClInclude Include="src\nrlib\mins.h" />
+    <ClInclude Include="src\nrlib\mins_ndim.h" />
+    <ClInclude Include="src\nrlib\nr3.h" />
+    <ClInclude Include="src\nrlib\qrdcmp.h" />
+    <ClInclude Include="src\nrlib\svd.h" />
+    <ClInclude Include="src\RTSolver.h" />
+    <ClInclude Include="src\transformMatrix.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\scrap\camerapos0.1\FSolver.h" />
-    <ClInclude Include="..\..\..\..\scrap\camerapos0.1\matrix.h" />
-    <ClInclude Include="..\..\..\..\scrap\camerapos0.1\nrlib\mins.h" />
-    <ClInclude Include="..\..\..\..\scrap\camerapos0.1\nrlib\mins_ndim.h" />
-    <ClInclude Include="..\..\..\..\scrap\camerapos0.1\nrlib\nr3.h" />
-    <ClInclude Include="..\..\..\..\scrap\camerapos0.1\nrlib\qrdcmp.h" />
-    <ClInclude Include="..\..\..\..\scrap\camerapos0.1\nrlib\svd.h" />
-    <ClInclude Include="..\..\..\..\scrap\camerapos0.1\numerical.h" />
-    <ClInclude Include="..\..\..\..\scrap\camerapos0.1\RTSolver.h" />
-    <ClInclude Include="..\..\..\..\scrap\camerapos0.1\transformMatrix.h" />
+    <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
