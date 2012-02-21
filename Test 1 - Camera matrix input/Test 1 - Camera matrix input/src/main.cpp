@@ -36,7 +36,7 @@ int main() {
   std::cout << P;
   std::cout << std::endl;
   std::cout << "Reference camera matrix is:" << std::endl;
-  std::cout << (M|zero);
+  std::cout << (MP|zero);
 
   return(0);
 }
