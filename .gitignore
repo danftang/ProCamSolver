@@ -54,3 +54,10 @@ _ReSharper*/
 
 #media files
 *.avi
+
+#emacs
+*~
+
+#cpp
+*.o
+*.out
