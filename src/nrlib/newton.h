@@ -1,5 +1,0 @@
-#include "nr3.h"
-#include "ludcmp.h"
-#include "qrdcmp.h"
-#include "mnewt.h"
-#include "roots_multidim.h"
