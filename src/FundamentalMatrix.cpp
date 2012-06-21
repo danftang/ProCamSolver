@@ -15,36 +15,24 @@
 //   governing permissions and limitations under the License.
 //
 ///////////////////////////////////////////////////////////////////////////////
-#ifndef CORRESPONDENCE_H
-#define CORRESPONDENCE_H
-
-#include "stdincludes.h"
-#include "GPixel.h"
-
-///////////////////////////////////////////////////////////////////////////////
-/// Class to represent the pixel positions of a single 3D point, projected
-/// into two cameras, 'i' and 'j'
-//////////////////////////////////////////////////////////////////////////////
-class Correspondence {
-public:
-  GPixel	i;
-  GPixel	j;
-};
+#include "FundamentalMatrix.h"
 
 
 ///////////////////////////////////////////////////////////////////////////////
+/// Calculates the epipoles of this matrix and enforces the epipolar
+/// constraint. After execution the epipoles are stored in 'eij' and 'eji'.
 ///////////////////////////////////////////////////////////////////////////////
-inline std::istream &operator >>(std::istream &in, Correspondence &c) {
-  in >> c.i.id >> c.j.id >> c.i.x >> c.i.y >> c.j.x >> c.j.y;
-  return(in);
+void FundamentalMatrix::calc_epipoles_and_constrain()
+{
+  Eigen::JacobiSVD<Eigen::Matrix3d>  svd;
+
+  svd.compute(*this, Eigen::ComputeFullU | Eigen::ComputeFullV);
+  Eigen::Vector3d D;
+  D = svd.singularValues();
+  D(2) = 0.0;
+  (*this) = svd.matrixU()* D.asDiagonal() * svd.matrixV().transpose();
+  eij = svd.matrixU().col(2);
+  eji = svd.matrixV().col(2);
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-inline std::ostream &operator <<(std::ostream &out, Correspondence &c) {
-  out << c.i << " <-> " << c.j;
-  return(out);
-}
-
-#endif

@@ -2,36 +2,37 @@
 #ifndef VIEWPROJECTIONMATRIX_H
 #define VIEWPROJECTIONMATRIX_H
 
-#include <ostream>
-#include "transformMatrix.h"
+#include "stdincludes.h"
+#include "TransformMatrix.h"
 
 class ViewProjectionMatrix {
 public:
   ViewProjectionMatrix();
 
-  Matrix<double>	R();	// rotation matrix
-  Matrix<double>	R1();	// inverse rotation matrix
-  Matrix<double>	M();	// projection matrix
-  Matrix<double>	M1();	// inverse projection matrix
-  Matrix<double>	M1T();	// transpose inverse projection matrix
-  Matrix<double>	T();	// translation cross-product
+  
+  Eigen::Matrix3d	R() const;	// rotation matrix
+  Eigen::Matrix3d	R1() const;	// inverse rotation matrix
+  Eigen::Matrix3d	M() const;	// projection matrix
+  Eigen::Matrix3d	M1() const;	// inverse projection matrix
+  Eigen::Matrix3d	M1T() const;	// transpose inverse projection matrix
+  Eigen::Matrix3d	T() const;	// translation cross-product
+  Eigen::Matrix<double,3,4> P() const; // Camera matrix
 
-  Matrix<double>	dR_drx(); // derivatives
-  Matrix<double>	dR_dry();
-  Matrix<double>	dR_drz();
-  Matrix<double>	dR1_drx();
-  Matrix<double>	dR1_dry();
-  Matrix<double>	dR1_drz();
-  Matrix<double>	dM1_dfx();
-  Matrix<double>	dM1_dfy();
-  Matrix<double>	dM1_dcx();
-  Matrix<double>	dM1_dcy();
-  Matrix<double>	dT_dtx();
-  Matrix<double>	dT_dty();
-  Matrix<double>	dT_dtz();
-
-  operator Matrix<double>();	// cast to the view-projection matrix
-  //  ViewProjectionMatrix & operator =(const Matrix<double> &);
+  /*****
+  Eigen::Matrix3d	dR_drx(); // derivatives
+  Eigen::Matrix3d	dR_dry();
+  Eigen::Matrix3d	dR_drz();
+  Eigen::Matrix3d	dR1_drx();
+  Eigen::Matrix3d	dR1_dry();
+  Eigen::Matrix3d	dR1_drz();
+  Eigen::Matrix3d	dM1_dfx();
+  Eigen::Matrix3d	dM1_dfy();
+  Eigen::Matrix3d	dM1_dcx();
+  Eigen::Matrix3d	dM1_dcy();
+  Eigen::Matrix3d	dT_dtx();
+  Eigen::Matrix3d	dT_dty();
+  Eigen::Matrix3d	dT_dtz();
+  ***/
 
   coord		rot;	// rotation vector
   coord		t;	// translation vector
@@ -55,212 +56,214 @@ inline ViewProjectionMatrix::ViewProjectionMatrix() :
   cx(0.0),
   cy(0.0)
 {
-  rot[0] = 0.0;
-  rot[1] = 0.0;
-  rot[2] = 0.0;
-  t[0] = 0.0;
-  t[1] = 0.0;
-  t[2] = 0.0;
+  rot(0) = 0.0;
+  rot(1) = 0.0;
+  rot(2) = 0.0;
+  t(0) = 0.0;
+  t(1) = 0.0;
+  t(2) = 0.0;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 //inline ViewProjectionMatrix &
-//ViewProjectionMatrix::operator =(const Matrix<double> &P) {
-//  Matrix<double>::operator=(P);
+//ViewProjectionMatrix::operator =(const Eigen::Matrix3d &P) {
+//  Eigen::Matrix3d::operator=(P);
 //  return(*this);
 //}
 
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-inline Matrix<double> ViewProjectionMatrix::R() {
-  return(transformMatrix(xrotate,rot[0]) *
-	 transformMatrix(yrotate,rot[1]) *
-	 transformMatrix(zrotate,rot[2]));
+inline Eigen::Matrix3d ViewProjectionMatrix::R() const {
+  return(TransformMatrix(xrotate,rot(0)) *
+	 TransformMatrix(yrotate,rot(1)) *
+	 TransformMatrix(zrotate,rot(2)));
 
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-inline Matrix<double> ViewProjectionMatrix::R1() {
-  return(transformMatrix(zrotate,-rot[2]) *
-	 transformMatrix(yrotate,-rot[1]) *
-	 transformMatrix(xrotate,-rot[0]));
+inline Eigen::Matrix3d ViewProjectionMatrix::R1() const {
+  return(TransformMatrix(zrotate,-rot(2)) *
+	 TransformMatrix(yrotate,-rot(1)) *
+	 TransformMatrix(xrotate,-rot(0)));
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-inline Matrix<double> ViewProjectionMatrix::M() {
-  return(transformMatrix(intrinsic,fx,fy,cx,cy));
+inline Eigen::Matrix3d ViewProjectionMatrix::M() const {
+  return(TransformMatrix(intrinsic,fx,fy,cx,cy));
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-inline Matrix<double> ViewProjectionMatrix::M1() {
-  return(transformMatrix(inverse_intrinsic,fx,fy,cx,cy));
+inline Eigen::Matrix3d ViewProjectionMatrix::M1() const {
+  return(TransformMatrix(inverse_intrinsic,fx,fy,cx,cy));
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-inline Matrix<double> ViewProjectionMatrix::M1T() {
-  return(transformMatrix(transpose_inverse_intrinsic,fx,fy,cx,cy));
+inline Eigen::Matrix3d ViewProjectionMatrix::M1T() const {
+  return(TransformMatrix(transpose_inverse_intrinsic,fx,fy,cx,cy));
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-inline Matrix<double> ViewProjectionMatrix::T() {
-  return(transformMatrix(cross_prod,t[0],t[1],t[2]));
+inline Eigen::Matrix3d ViewProjectionMatrix::T() const {
+  return(TransformMatrix(cross_prod,t(0),t(1),t(2)));
 }
 
 
+/*****************
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-inline Matrix<double> ViewProjectionMatrix::dR_drx() {
+inline Eigen::Matrix3d ViewProjectionMatrix::dR_drx() {
   const double PI = 3.1415926535897932;
-  return(transformMatrix(xrotate,rot[0] + PI/2.0) *
-	 transformMatrix(yrotate,rot[1]) *
-	 transformMatrix(zrotate,rot[2]));
+  return(TransformMatrix(xrotate,rot(0) + PI/2.0) *
+	 TransformMatrix(yrotate,rot(1)) *
+	 TransformMatrix(zrotate,rot(2)));
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-inline Matrix<double> ViewProjectionMatrix::dR_dry() {
+inline Eigen::Matrix3d ViewProjectionMatrix::dR_dry() {
   const double PI = 3.1415926535897932;
-  return(transformMatrix(xrotate,rot[0]) *
-	 transformMatrix(yrotate,rot[1] + PI/2.0) *
-	 transformMatrix(zrotate,rot[2]));
+  return(TransformMatrix(xrotate,rot(0)) *
+	 TransformMatrix(yrotate,rot(1) + PI/2.0) *
+	 TransformMatrix(zrotate,rot(2)));
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-inline Matrix<double> ViewProjectionMatrix::dR_drz() {
+inline Eigen::Matrix3d ViewProjectionMatrix::dR_drz() {
   const double PI = 3.1415926535897932;
-  return(transformMatrix(xrotate,rot[0]) *
-	 transformMatrix(yrotate,rot[1]) *
-	 transformMatrix(zrotate,rot[2] + PI/2.0));
+  return(TransformMatrix(xrotate,rot(0)) *
+	 TransformMatrix(yrotate,rot(1)) *
+	 TransformMatrix(zrotate,rot(2) + PI/2.0));
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-inline Matrix<double> ViewProjectionMatrix::dR1_drx() {
+inline Eigen::Matrix3d ViewProjectionMatrix::dR1_drx() {
   const double PI = 3.1415926535897932;
-  return(transformMatrix(zrotate,-rot[2]) *
-	 transformMatrix(yrotate,-rot[1]) *
-	 transformMatrix(xrotate,-rot[0] - PI/2.0));
+  return(TransformMatrix(zrotate,-rot(2)) *
+	 TransformMatrix(yrotate,-rot(1)) *
+	 TransformMatrix(xrotate,-rot(0) - PI/2.0));
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-inline Matrix<double> ViewProjectionMatrix::dR1_dry() {
+inline Eigen::Matrix3d ViewProjectionMatrix::dR1_dry() {
   const double PI = 3.1415926535897932;
-  return(transformMatrix(zrotate,-rot[2]) *
-	 transformMatrix(yrotate,-rot[1] - PI/2.0) *
-	 transformMatrix(xrotate,-rot[0]));
+  return(TransformMatrix(zrotate,-rot(2)) *
+	 TransformMatrix(yrotate,-rot(1) - PI/2.0) *
+	 TransformMatrix(xrotate,-rot(0)));
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-inline Matrix<double> ViewProjectionMatrix::dR1_drz() {
+inline Eigen::Matrix3d ViewProjectionMatrix::dR1_drz() {
   const double PI = 3.1415926535897932;
-  return(transformMatrix(zrotate,-rot[2] - PI/2.0) *
-	 transformMatrix(yrotate,-rot[1]) *
-	 transformMatrix(xrotate,-rot[0]));
+  return(TransformMatrix(zrotate,-rot(2) - PI/2.0) *
+	 TransformMatrix(yrotate,-rot(1)) *
+	 TransformMatrix(xrotate,-rot(0)));
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-inline Matrix<double> ViewProjectionMatrix::dM1_dfx() {
-  Matrix<double> result(3,3);
-  result = 0.0;
-  result[0][0] = -1.0/(fx*fx);
+inline Eigen::Matrix3d ViewProjectionMatrix::dM1_dfx() {
+  Eigen::Matrix3d result;
+  result.fill(0.0);
+  result(0,0) = -1.0/(fx*fx);
   return(result);
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-inline Matrix<double> ViewProjectionMatrix::dM1_dfy() {
-  Matrix<double> result(3,3);
-  result = 0.0;
-  result[1][1] = -1.0/(fy*fy);
+inline Eigen::Matrix3d ViewProjectionMatrix::dM1_dfy() {
+  Eigen::Matrix3d result;
+  result.fill(0.0);
+  result(1,1) = -1.0/(fy*fy);
   return(result);
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-inline Matrix<double> ViewProjectionMatrix::dM1_dcx() {
-  Matrix<double> result(3,3);
-  result = 0.0;
-  result[0][2] = -1.0/fx;
+inline Eigen::Matrix3d ViewProjectionMatrix::dM1_dcx() {
+  Eigen::Matrix3d result;
+  result.fill(0.0);
+  result(0,2) = -1.0/fx;
   return(result);
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-inline Matrix<double> ViewProjectionMatrix::dM1_dcy() {
-  Matrix<double> result(3,3);
-  result = 0.0;
-  result[1][2] = -1.0/fy;
+inline Eigen::Matrix3d ViewProjectionMatrix::dM1_dcy() {
+  Eigen::Matrix3d result;
+  result.fill(0.0);
+  result(1,2) = -1.0/fy;
   return(result);
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-inline Matrix<double> ViewProjectionMatrix::dT_dtx() {
-  Matrix<double> result(3,3);
-  result = 0.0;
-  result[1][2] = -1.0;
-  result[2][1] = 1.0;
+inline Eigen::Matrix3d ViewProjectionMatrix::dT_dtx() {
+  Eigen::Matrix3d result;
+  result.fill(0.0);
+  result(1,2) = -1.0;
+  result(2,1) = 1.0;
   return(result);
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-inline Matrix<double> ViewProjectionMatrix::dT_dty() {
-  Matrix<double> result(3,3);
-  result = 0.0;
-  result[0][2] = 1.0;
-  result[2][0] = -1.0;
+inline Eigen::Matrix3d ViewProjectionMatrix::dT_dty() {
+  Eigen::Matrix3d result;
+  result.fill(0.0);
+  result(0,2) = 1.0;
+  result(2,0) = -1.0;
   return(result);
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-inline Matrix<double> ViewProjectionMatrix::dT_dtz() {
-  Matrix<double> result(3,3);
-  result = 0.0;
-  result[0][1] = -1.0;
-  result[1][0] = 1.0;
+inline Eigen::Matrix3d ViewProjectionMatrix::dT_dtz() {
+  Eigen::Matrix3d result;
+  result.fill(0.0);
+  result(0,1) = -1.0;
+  result(1,0) = 1.0;
   return(result);
 }
-
+***************/
 
 ///////////////////////////////////////////////////////////////////////////////
-//
-// casts to a matrix containing the view-projection matrix
-//
+/// Returns the camera matrix of this
 ///////////////////////////////////////////////////////////////////////////////
-inline ViewProjectionMatrix::operator Matrix<double>() {
-  transformMatrix	I(identity);
-  return(M() * R() * (I | t));
+inline Eigen::Matrix<double,3,4> ViewProjectionMatrix::P() const {
+  Eigen::Matrix<double,3,4>	Projection;
+  Projection.topLeftCorner(3,3) = Eigen::Matrix3d::Identity();
+  Projection.col(3) = -t;
+  Projection = M() * R() * Projection;
+  return(Projection);
 }
 
 
@@ -268,9 +271,9 @@ inline ViewProjectionMatrix::operator Matrix<double>() {
 ///////////////////////////////////////////////////////////////////////////////
 inline std::ostream &operator <<(std::ostream &out, ViewProjectionMatrix &v) {
   out << "rotation = " 
-      << v.rot[0] << ", " << v.rot[1] << ", " << v.rot[2] << std::endl;
+      << v.rot(0) << ", " << v.rot(1) << ", " << v.rot(2) << std::endl;
   out << "translation = "
-      << v.t[0] << ", " << v.t[1] << ", " << v.t[2] << std::endl;
+      << v.t(0) << ", " << v.t(1) << ", " << v.t(2) << std::endl;
   out << "intrinsics = " 
       << v.fx << ", " << v.fy << " | " << v.cx << ", " << v.cy << std::endl;
   return(out);

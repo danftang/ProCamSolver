@@ -1,144 +1,120 @@
 #include <iostream>
 #include <cstdlib>
 
-#include "RadialViewProjectionMatrix.h"
-#include "SceneSynth.h"
-#include "RPSolver.h"
-//#include "RPSolverLevMar2.h"
-#include "PSolver.h"
-#include "CorrespondenceSet.h"
+#include "MeasurementMatrix.h"
+#include "ShapeMatrix.h"
+#include "MotionMatrix.h"
+
+using namespace Eigen;
 
 int main() {
-  std::map<int, ViewProjectionMatrix>	cameras;
-  std::map<int, RadialViewProjectionMatrix>	rcameras;
-  std::map<int, RadialViewProjectionMatrix>	myFit;
-  //std::map<int, ViewProjectionMatrix>	myFit;
-  std::map<int, transformMatrix>    	intrinsics;
-  std::vector<Correspondence>		correspondences;
-  RadialViewProjectionMatrix		view;
-  double				residual;
-  int 					i;
+  const int 			N = 5;			// number of cameras
+  const int 			F = 2;			// number of fixed cams
+  MotionMatrix<N>		cameras;		// camera matrices
+  MotionMatrix<N>		reconstruction;		// camera matrices
+  ShapeMatrix			shape;			// 3D-points
+  ImageTransform<N>		Ks,Rs;			// camera matrices
+  MeasurementMatrix<N>		correspondences;	// correspondences
+  double			skew;
+  ImageTransform<F>		fixedIntrinsics;
+  Affine2d			K;
+  Matrix3d			R;
 
-  // --- Set up a scene with 3 cameras
+  // --- Set up a scene with N cameras
   // ---------------------------------
-  view.fx = 1.0;
-  view.fy = 1.0;
-  view.cx = 0.0;
-  view.cy = 0.0;
-  view.rot[0] = 0.0;
-  view.rot[1] = 0.0;
-  view.rot[2] = 0.0;
-  view.t[0] = 0.0;
-  view.t[1] = 0.0;
-  view.t[2] = 0.0;
-  cameras[0] = view;
-  rcameras[0] = view;
-  intrinsics[0] = transformMatrix(intrinsic, view.fx,view.fy,view.cx,view.cy);
+  K = Scaling(1.234);
+  cameras.M(0) = 		K.matrix();
+  cameras.T(0) = 		Vector3d(0.0, 0.0, 0.0);
+  fixedIntrinsics.view(0) = 	K.matrix();
 
-  view.fx = 1.0;
-  view.fy = 1.2;
-  view.cx = 0.01;
-  view.cy = 0.02;
-  view.rot[0] = 0.0;
-  view.rot[1] = 0.1;//46364;
-  view.rot[2] = 0.0;
-  view.t[0] = 1.0;
-  view.t[1] = 0.0;
-  view.t[2] = 0.0;
-  cameras[1] = view;
-  rcameras[1] = view;
-  intrinsics[1] = transformMatrix(intrinsic, view.fx,view.fy,view.cx,view.cy);
+  K = Scaling(1.2);
+  R = AngleAxisd(0.1,Vector3d::UnitY());
+  cameras.M(1) = 		K * R;
+  cameras.T(1) = 		Vector3d(1.0, 0.0, 0.0);
+  fixedIntrinsics.view(1) = 	K.matrix();
 
-  view.fx = 1.0123;
-  view.fy = 1.0345;
-  view.cx = 0.0678;
-  view.cy = 0.0789;
-  view.rot[0] = 0.0;
-  view.rot[1] = 0.2;
-  view.rot[2] = 0.0;
-  view.t[0] = 2.0;
-  view.t[1] = 1.0;
-  view.t[2] = 0.0;
-  cameras[2] = view;
-  rcameras[2] = view;
-  intrinsics[2] = transformMatrix(intrinsic, view.fx,view.fy,view.cx,view.cy);
+  K = Scaling(1.0345);
+  R = AngleAxisd(0.2,Vector3d::UnitY());
+  cameras.M(2) = 		K * R;
+  cameras.T(2) = 		Vector3d(2.0, 1.0, -0.1);
 
-  view.fx = 1.0123;
-  view.fy = 1.0345;
-  view.cx = 0.0678;
-  view.cy = 0.0789;
-  view.rot[0] = 0.1;
-  view.rot[1] = 0.1;
-  view.rot[2] = 0.1;
-  view.t[0] = 3.0;
-  view.t[1] = -1.0;
-  view.t[2] = 0.1;
-  cameras[3] = view;
-  rcameras[3] = view;
-  intrinsics[3] = transformMatrix(intrinsic, view.fx,view.fy,view.cx,view.cy);
+  K = Translation2d(0,0.25) * Scaling(1.0123);
+  R = AngleAxisd(0.1,Vector3d::UnitX()) *
+      AngleAxisd(0.1,Vector3d::UnitY()) * 
+      AngleAxisd(0.1,Vector3d::UnitZ());
+  cameras.M(3) = 		K * R;
+  cameras.T(3) = 		Vector3d(3.0, -1.0, 0.1);
 
+  K = Translation2d(0,0.25) * Scaling(1.0123);
+  R = AngleAxisd(-0.1,Vector3d::UnitX()) *
+      AngleAxisd(0.1,Vector3d::UnitY()) * 
+      AngleAxisd(-0.1,Vector3d::UnitZ());
+  cameras.M(4) = 		K * R;
+  cameras.T(4) = 		Vector3d(4.0, -1.0, -0.1);
 
-  view.fx = 1.0123;
-  view.fy = 1.0345;
-  view.cx = 0.0678;
-  view.cy = 0.0789;
-  view.rot[0] = 0.0;
-  view.rot[1] = 0.0;
-  view.rot[2] = 0.0;
-  view.t[0] = 4.0;
-  view.t[1] = 0.0;
-  view.t[2] = 0.0;
-  cameras[4] = view;
-  rcameras[4] = view;
-  intrinsics[4] = transformMatrix(intrinsic, view.fx,view.fy,view.cx,view.cy);
-
-  /****
-
-  view.fx = 1.0123;
-  view.fy = 1.0345;
-  view.cx = 0.0678;
-  view.cy = 0.0789;
-  view.rot[0] = 0.0;
-  view.rot[1] = 0.0;
-  view.rot[2] = 0.0;
-  view.t[0] = 5.0;
-  view.t[1] = 0.0;
-  view.t[2] = 0.0;
-  cameras[5] = view;
-  ***/
+  std::cout << "Original MotionMatrix = " << std::endl;
+  std::cout << cameras << std::endl;
 
   // --- synthesise a vector of pixel correspondences
   // ------------------------------------------------
-  SceneSynth 	myScene(cameras);
-  myScene.generate_correspondences(correspondences, cameras, 20);
+  Eigen::Matrix4d H;
+  Eigen::VectorXd err;
+  int i;
 
-  // --- now solve for the correspondences,
-  // --- given the intrinsics from 2 of the
-  // --- cameras, returning the residual
-  // --------------------------------------
-  try{ 
-    std::cout << "Fitting..." << std::endl;
 
-    //CorrespondenceSet myCors;
-    //myCors.load("correspondences.dat");
-    //myFit = RPSolver(myCors, residual);
+  correspondences.synthesise_measurements(cameras, 15, 0.0);
+  correspondences.synthesise_occlusions(0.08);
 
-    //rcameras[2].t[0] += 0.1;
-    //myFit = RPSolver(correspondences, rcameras, residual);
-    myFit = RPSolver(correspondences, intrinsics, residual);
+  std::cout << "Original Correspondences = " << std::endl;
+  std::cout << correspondences << std::endl;
 
-  } catch(const char *err) {
-    std::cerr << "Caught error " << err << std::endl;
-  }
-  // --- Print out the results of the fit
-  // ------------------------------------
-  std::cout << "residual = " << residual << std::endl;
-  for(i=0; i<myFit.size(); ++i) {
-    std::cout << "Camera " << i << std::endl;
-    std::cout << "--------" << std::endl;
-    std::cout << myFit[i];
-    std::cout << std::endl;
-  }
 
+  reconstruction.svd_solve(correspondences);
+
+
+  //Eigen::Vector3d p;
+  //p = reconstruction.plane_at_infinity(3);
+  //H = reconstruction.euclidean_lift(p);
+  H = reconstruction.diac_euclidean_lift(3,fixedIntrinsics);
+  reconstruction *= H;
+
+  reconstruction.reprojection_err(correspondences, err);
+  std::cout << "SVD reprojection err = " << std::endl;
+  std::cout << err.norm()/(correspondences.cols()*N*2.0*(1.0-0.08))<<std::endl;
+
+  std::cout << "Reconstructed camera matrix =" << std::endl;
+  std::cout << reconstruction << std::endl;
+  skew = reconstruction.KR_decompose(Ks,Rs);
+  std::cout << "Intrinsics are" << std::endl;
+  std::cout << Ks << std::endl;
+  std::cout << "Rotations are" << std::endl;
+  std::cout << Rs << std::endl;
+
+  //reconstruction = cameras;
+  //reconstruction += MotionMatrix<N>::Random()*0.001;
+  //reconstruction.M(0)(0,0) = 1.2;
+  //reconstruction.M(0)(0,2) = 0.01;
+  //reconstruction.M(0)(1,2) = -0.01;
+
+  /***********
+  std::cout << "Starting Bundle Adjustment" << std::endl;
+
+  reconstruction.bundle_adjust(0, correspondences);
+
+  shape.solve(correspondences, reconstruction);
+
+  reconstruction.reprojection_err(correspondences, err);
+  std::cout << "Adjusted reprojection err = " << std::endl;
+  std::cout << err.norm()/(correspondences.cols()*N*2.0*(1.0-0.08))<<std::endl;
+
+  std::cout << "Adjusted camera matrix =" << std::endl;
+  std::cout << reconstruction << std::endl;
+  skew = reconstruction.KR_decompose(Ks,Rs);
+  std::cout << "Intrinsics are" << std::endl;
+  std::cout << Ks << std::endl;
+  std::cout << "Rotations are" << std::endl;
+  std::cout << Rs << std::endl;
+
+  *******/
   return(0);
 }

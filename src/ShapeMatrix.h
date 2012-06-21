@@ -15,36 +15,27 @@
 //   governing permissions and limitations under the License.
 //
 ///////////////////////////////////////////////////////////////////////////////
-#ifndef CORRESPONDENCE_H
-#define CORRESPONDENCE_H
+#ifndef SHAPEMATRIX_H
+#define SHAPEMATRIX_H
 
 #include "stdincludes.h"
-#include "GPixel.h"
+
+template<int M> class MeasurementMatrix;
+template<int M> class MotionMatrix;
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class to represent the pixel positions of a single 3D point, projected
-/// into two cameras, 'i' and 'j'
-//////////////////////////////////////////////////////////////////////////////
-class Correspondence {
+/// Class to represent the homogeneous coordinates of a set of 3D points
+///////////////////////////////////////////////////////////////////////////////
+class ShapeMatrix : public Eigen::Matrix4Xd {
 public:
-  GPixel	i;
-  GPixel	j;
+
+  template<int V>
+  void		solve(const MeasurementMatrix<V> &, const MotionMatrix<V> &);
+
+  template<class D>
+  ShapeMatrix &operator =(const Eigen::MatrixBase<D> &);
 };
 
-
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-inline std::istream &operator >>(std::istream &in, Correspondence &c) {
-  in >> c.i.id >> c.j.id >> c.i.x >> c.i.y >> c.j.x >> c.j.y;
-  return(in);
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-inline std::ostream &operator <<(std::ostream &out, Correspondence &c) {
-  out << c.i << " <-> " << c.j;
-  return(out);
-}
+#include "ShapeMatrix.hpp"
 
 #endif

@@ -1,9 +1,9 @@
-#include <iostream>
-#include <fstream>
-#include <vector>
-
+#include "stdincludes.h"
 #include "Correspondence.h"
 
+///////////////////////////////////////////////////////////////////////////////
+/// Class to represent a set of 
+//////////////////////////////////////////////////////////////////////////////
 class CorrespondenceSet : public std::vector<Correspondence> {
 public:
   class RawCorrespondence {
@@ -19,7 +19,8 @@ public:
     double w;
   };
 
-  void load(const char *);
+  void 	load(const char *);
+  void	synthesize_correspondences(std::map<int,ViewProjectionMatrix> &, int, double);
 
 };
 

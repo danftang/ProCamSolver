@@ -3,32 +3,24 @@
 
 
 ///////////////////////////////////////////////////////////////////////////////
+///
+/// Constructs a scene synthesiser containing a set of cameras with the
+/// given CameraMatrices
+///
+/// \param cameras set of cameras to install in this synthetic scene.
+///
 ///////////////////////////////////////////////////////////////////////////////
-SceneSynth::SceneSynth(std::map<int, ViewProjectionMatrix> &cameras) {
+SceneSynth::SceneSynth(std::map<int, ViewProjectionMatrix> &cameras, double n) {
   std::map<int, ViewProjectionMatrix>::iterator vi, vj;
   ViewRelation	view;
 
-  for(vj = cameras.begin(); vj != cameras.end(); ++vj) {
-    for(vi = cameras.begin(); vi != vj; ++vi) {
-      view.i = vi->first;
-      view.j = vj->first;
-      view.F = F(vi->second, vj->second);
-      push_back(view);
-    }
-  }
-}
-
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-Matrix<double> SceneSynth::F(ViewProjectionMatrix &pi, 
-			     ViewProjectionMatrix &pj) {
-  return(pj.M1T() * pj.R() * (pj.T() - pi.T()) * pi.R1() * pi.M1());
+  noise = n;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-void SceneSynth::generate_correspondences(std::vector<Correspondence> &cor,
+void SceneSynth::generate_correspondences(CorrespondenceSet &cor,
 				    std::map<int,ViewProjectionMatrix> &cams,
 				    int N) {
   const double  sceneOffset = 2.0;
@@ -49,12 +41,10 @@ void SceneSynth::generate_correspondences(std::vector<Correspondence> &cor,
 	qj = vj->second.M()*(vj->second.R()*(Q - vj->second.t));
 	C.i = vi->first;
 	C.j = vj->first;
-	C.xi = qi[0]/qi[2];
-	C.yi = qi[1]/qi[2];
-	C.xj = qj[0]/qj[2];
-	C.yj = qj[1]/qj[2];
-	//std::cout << "Creating correspondence " << C << std::endl;
-	//std::cout << "qj F qi = " << (qj*(F(vi->second, vj->second)*qi)).sum() << std::endl;
+	C.xi = (qi[0]/qi[2]) + (rand()*(2.0*noise)/RAND_MAX) - noise;
+	C.yi = (qi[1]/qi[2]) + (rand()*(2.0*noise)/RAND_MAX) - noise;
+	C.xj = (qj[0]/qj[2]) + (rand()*(2.0*noise)/RAND_MAX) - noise;
+	C.yj = (qj[1]/qj[2]) + (rand()*(2.0*noise)/RAND_MAX) - noise;
 	cor.push_back(C);
       }
     }

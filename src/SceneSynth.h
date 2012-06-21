@@ -11,17 +11,17 @@
 #include <map>
 #include "ViewRelation.h"
 #include "ViewProjectionMatrix.h"
-#include "Matrix.h"
 #include "Correspondence.h"
+#include "CorrespondenceSet.h"
 
-class SceneSynth : public std::vector<ViewRelation> {
+class SceneSynth {
 public:
   SceneSynth(std::map<int, ViewProjectionMatrix> &);
 
-  Matrix<double>	F(ViewProjectionMatrix &, ViewProjectionMatrix &);
-  void			generate_correspondences(std::vector<Correspondence> &,
+  void			generate_correspondences(CorrespondenceSet &,
 					std::map<int, ViewProjectionMatrix> &,
 					int);
+  double	noise;
 };
 
 
