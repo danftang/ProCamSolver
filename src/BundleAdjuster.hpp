@@ -55,7 +55,7 @@ int BundleAdjuster<M>::operator()(const Eigen::VectorXd &params,
   //std::cout << "Size error = " << errs(errs.size()-1) << std::endl;
   //std::cout << "Reprojection error = " << std::endl;
   //std::cout << errs << std::endl;
-  std::cout << "Err = " << errs.norm()/(2.0*M*measurement.cols()*0.92) << std::endl;
+  std::cout << "Err = " << errs.norm()/errs.rows() << std::endl;
   return(0);
 }
 
@@ -195,13 +195,12 @@ void BundleAdjuster<M>::params_to_matrices(const Eigen::VectorXd &params) {
       motion.T(v) = translation(v,params);
     }
   }
-  motion.T(0).setZero();
+  // motion.T(0).setZero();
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Copies the motion matrix to the internal parameters. Assumes T(0)
-/// is at the origin.
+/// Copies the motion matrix to the internal parameters.
 ///////////////////////////////////////////////////////////////////////////////
 template<int M>
 void BundleAdjuster<M>::matrices_to_params() {
@@ -224,13 +223,15 @@ void BundleAdjuster<M>::matrices_to_params() {
       rotation(v, variableParams)    = angleaxis_to_rotation(R);
       translation(v, variableParams) = motion.T(v) / Mscale;
       translation_norm += translation(v, variableParams).squaredNorm();
+    } else {
+      motion.T(0) /= Mscale;
+      translation_norm += motion.T(0).squaredNorm();
     }
   }
 
   // --- normalise scale of translations
   translation_norm = sqrt(translation_norm);
   for(v = 1; v<M; ++v) {
-    // translation(v, variableParams) -= motion.T(0);
     translation(v, variableParams) *= M/translation_norm;
   }
 }
@@ -276,8 +277,11 @@ int BundleAdjuster<M>::levmar_solve(int nFixedIntrinsics) {
   variableParams.resize(6*(M-1) + 3*(M-nFixedIntrinsics));
   matrices_to_params();
 
-  Eigen::VectorXd tmperr;
   params_to_matrices(variableParams);
+  std::cout << "Parameterised motion matrix = " << std::endl;
+  std::cout << motion << std::endl;
+
+  Eigen::VectorXd tmperr;
   motion.reprojection_err(measurement, tmperr);
   std::cout << "Parameterised reprojection err = " << std::endl;
   std::cout << tmperr.norm()/(2.0*nPixels) << std::endl;

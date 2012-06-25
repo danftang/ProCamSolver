@@ -54,6 +54,7 @@ public:
   void	scale_and_fill(const MotionMatrix<M> &, const ShapeMatrix &);
   void	synthesise_measurements(const MotionMatrix<M> &, int, double);
   void	synthesise_occlusions(double);
+  void	order_cols_by_occlusions();
   
   PixelRef	pixel(int,int);
   constPixelRef pixel(int,int) const;

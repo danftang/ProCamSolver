@@ -40,6 +40,7 @@ public:
   TransformType &		view(int v);
   const TransformType &		view(int v) const;
   template<class D>  void	apply_to(Eigen::MatrixBase<D> &);
+  template<class D>  void	apply_inverse_to(Eigen::MatrixBase<D> &);
   
 protected:
   TransformType			views[M];
@@ -94,6 +95,20 @@ void ImageTransform<M>::apply_to(Eigen::MatrixBase<D> &X) {
 
   for(i = 0; i< M; ++i) {
     X.middleRows(3*i,3) = view(i) * X.middleRows(3*i,3);
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+/// transforms X so that TX -> X. i.e. X -> T^-1X
+//////////////////////////////////////////////////////////////////////////////
+template<int M>
+template<class D>
+void ImageTransform<M>::apply_inverse_to(Eigen::MatrixBase<D> &X) {
+  int i;
+
+  for(i = 0; i< M; ++i) {
+    X.middleRows(3*i,3) = view(i).inverse() * X.middleRows(3*i,3);
   }
 }
 

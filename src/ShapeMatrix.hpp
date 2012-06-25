@@ -37,7 +37,7 @@
 template<int V>
 void ShapeMatrix::solve(const MeasurementMatrix<V> &M, const MotionMatrix<V> &P) {
   double			lambda;	// projective depth
-  double			px, py;
+  double			px, py; // pixel coords
   int 				i,j;
   int				visiblePixels;
   Eigen::Matrix<double,2*V,3>	coeffs;	// matrix for least squares solution
@@ -72,20 +72,24 @@ void ShapeMatrix::solve(const MeasurementMatrix<V> &M, const MotionMatrix<V> &P)
 
     if(visiblePixels < 2) {
       // --- not enough pixels to constrain X
-      // --- so just choose a null vector
-      block<3,1>(0,j) =
-	coeffs.jacobiSvd(Eigen::ComputeFullU | Eigen::ComputeFullV).solve(y);
-      continue;
+      // --- so add constraint of unit projective depth
+      if(visiblePixels == 0) {
+	block<3,1>(0,j).setZero();
+	continue;
+      }
+      for(i=0; coeffs.row(i).norm() != 0.0; ++i);
+      coeffs.row(i) = P.M(i).row(2);
+      y(i) = 1.0 - P.T(i)(2);
     }
 
     // --- first estimate lambda
     // --- and use to set weights
 
+    //block<3,1>(0,j) =
+    //coeffs.jacobiSvd(Eigen::ComputeFullU | Eigen::ComputeFullV).solve(y);
     block<3,1>(0,j) =
       (coeffs.transpose() * coeffs).ldlt().solve(coeffs.transpose()*y);
 
-    //std::cout << "Approx X = " << col(j) << std::endl;
-    //std::cout << "Error = " << std::endl << coeffs * block<3,1>(0,j) - y << std::endl;
 
     for(i=0; i<V; ++i) {
       lambda = P.view(i).row(2)*col(j);
@@ -94,15 +98,16 @@ void ShapeMatrix::solve(const MeasurementMatrix<V> &M, const MotionMatrix<V> &P)
     }
 
     // --- now re-solve with weights
-    /****
-    block<3,1>(0,j) = 
-      coeffs.jacobiSvd(Eigen::ComputeFullU | Eigen::ComputeFullV).solve(y);
-    ****/
+    //block<3,1>(0,j) = 
+    //coeffs.jacobiSvd(Eigen::ComputeFullU | Eigen::ComputeFullV).solve(y);
+
     block<3,1>(0,j) =
       (coeffs.transpose() * coeffs).ldlt().solve(coeffs.transpose()*y);
 
-    //std::cout << "Min X = " << col(j) << std::endl;
-    //std::cout << "Shape/Motion error = " << std::endl << coeffs * block<3,1>(0,j) - y << std::endl;
+    //std::cout << "Approx X = " << col(j).transpose() << std::endl;
+    //std::cout << "Error = " << (coeffs * block<3,1>(0,j) - y).norm() 
+    //      << std::endl;
+
   }
   //std::cout << "Reconstruction = " << std::endl;
   //std::cout << P*(*this) << std::endl;

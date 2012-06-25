@@ -18,28 +18,80 @@
 
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Loads a set of pixel correspondences from a file in the format
+/// Loads a set of pixel correspondences from a sorted file in the format
 ///  <id1> <id2> <x1> <y1> <x2> <y2>
 ///
 /// where
 ///
-/// id1/2      = id of the first/second camera
-/// x1/2, y1/2 = pixel coordinate of the first/second camera
+/// id1/2      = id of the projector / camera
+/// x1/2, y1/2 = pixel coordinate of the projector / camera
 ///
 ///////////////////////////////////////////////////////////////////////////////
 template<int M>
 bool MeasurementMatrix<M>::load(const char *filename) {
-  std::ifstream myFile(filename);
-  int i;
-  Correspondence c;
+  std::ifstream 	myFile(filename);
+  Correspondence 	c;
+  GPixel		currentProjPixel;
+  int			points;
+  int			currentCol;
+  const double		p = 0.01; // probability of loading point
+  const int		cameras = 5;
 
   if(!myFile) return(false);
-  i = 10000;
-  while(i >0 && (myFile >> c)) {
-    add_correspondence(c);
-    //    std::cout << c << std::endl;
-    --i;
+  std::cout << "Loading correspondences" << std::endl;
+
+  // --- count number of 3D points
+  currentProjPixel.id = -1;
+  points = 0;
+  while(myFile >> c) {
+    if(c.i != currentProjPixel) {
+      currentProjPixel = c.i;
+      ++points;
+    }
   }
+  std::cout <<"Found "<< points <<" points" << std::endl;
+  Base::resize(3*M, points);
+
+  // ### scan back to beginning of file ###
+  myFile.clear();
+  myFile.seekg(0, std::ios::beg);
+
+  // --- form columns one by one
+  // --- assuming file is ordered
+  // --- by projector pixels.
+  currentProjPixel.id = -1;
+  currentCol = 0;
+  myFile >> c;
+  while(myFile) {
+    if((rand()*1.0/RAND_MAX) < p) {
+      currentProjPixel = c.i;
+
+      c.i.id += cameras; // test
+
+      pixel(c.i.id, currentCol)(0) = c.i.x;
+      pixel(c.i.id, currentCol)(1) = c.i.y;
+      pixel(c.i.id, currentCol)(2) = 1.0;
+
+      //      std::cout << currentProjPixel << std::endl;
+
+      do {
+	c.j.y *= 0.75; 	// test
+	c.j.id -= 1;    // test
+	
+	pixel(c.j.id, currentCol)(0) = c.j.x;
+	pixel(c.j.id, currentCol)(1) = c.j.y;
+	pixel(c.j.id, currentCol)(2) = 1.0;
+
+	myFile >> c;
+      } while(myFile && c.i == currentProjPixel);
+      ++currentCol;
+    } else {
+      // skip 3D point
+      while(myFile >> c && c.i == currentProjPixel) {;}
+    }
+  }
+  Base::conservativeResize(3*M, currentCol);
+  std::cout <<"Loaded "<< currentCol <<" points" << std::endl;
   myFile.close();
   return(true);
 }
@@ -308,7 +360,7 @@ bool MeasurementMatrix<M>::pixel_is_occluded(int view, int point) const {
 ///////////////////////////////////////////////////////////////////////////////
 template<int M>
 int MeasurementMatrix<M>::new_column() {
-  conservativeResize(Eigen::NoChange, cols()+1);
+  Base::conservativeResize(Eigen::NoChange, cols()+1);
   return(cols()-1);
 }
 
@@ -320,7 +372,7 @@ int MeasurementMatrix<M>::new_column() {
 ///////////////////////////////////////////////////////////////////////////////
 template<int M>
 int MeasurementMatrix<M>::new_columns(int n) {
-  conservativeResize(Eigen::NoChange, cols()+n);
+  Base::conservativeResize(Eigen::NoChange, cols()+n);
   return(cols()-n);
 }
 
@@ -402,6 +454,15 @@ int MeasurementMatrix<M>::insert_column_and_expand(ColXpr c) {
     }
   }
   return(k);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// reorder the columns of *this so that columns with the same occluded
+// pixels are adjacent.
+///////////////////////////////////////////////////////////////////////////////
+template<int M>
+void MeasurementMatrix<M>::order_cols_by_occlusions() {
 }
 
 

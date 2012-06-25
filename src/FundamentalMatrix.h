@@ -124,8 +124,8 @@ eight_point_algorithm(const Eigen::MatrixBase<DERIVED1> &a,
   // ---------------------------------
   calc_epipoles_and_constrain();
 
-  std::cout << "Residual in eight_point_algorithm = " << std::endl;
-  std::cout << (a.transpose() * (*this) * b).diagonal() << std::endl;
+  // std::cout << "Residual in eight_point_algorithm = " << std::endl;
+  // std::cout << (a.transpose() * (*this) * b).diagonal() << std::endl;
 }
 
 //////////////////////////////////////////////////////////////////////////////

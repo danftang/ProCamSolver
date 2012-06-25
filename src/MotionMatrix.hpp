@@ -17,7 +17,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include "MeasurementMatrix.h"
 #include "BundleAdjuster.h"
-#include "StrumTriggsSolver.h"
+#include "SturmTriggsSolver.h"
 
 //////////////////////////////////////////////////////////////////////////////
 /// returns a refrence to the v'th camera matrix
@@ -77,7 +77,7 @@ typename MotionMatrix<V>::constBlock31 MotionMatrix<V>::T(int v) const {
 /// The following method is used:
 ///
 /// 1) Calculate projective depths from the Fundamental matrices
-/// (Strum and Triggs 1996)
+/// (Sturm and Triggs 1996)
 ///
 /// 2) Approximate the shape/motion matrices using method of Martinec
 /// and Pajdla (2002)
@@ -93,7 +93,7 @@ template<int V>
 void MotionMatrix<V>::svd_solve(const MeasurementMatrix<V> &measurement) {
 
   ShapeMatrix		shape;
-  StrumTriggsSolver<V>	stSolver(*this, shape);
+  SturmTriggsSolver<V>	stSolver(*this, shape);
 
   stSolver.solve(measurement);
 
@@ -128,7 +128,8 @@ double MotionMatrix<V>::bundle_adjust(int f, const MeasurementMatrix<V> &measure
   ImageTransform<V>	denormalisation;
   BundleAdjuster<V>	ba_solver(scaledMeasurement, *this);
 
-  scaledMeasurement.normalise(denormalisation);
+  scaledMeasurement.normalise(denormalisation, true);
+  denormalisation.apply_inverse_to(*this);
   ba_solver.levmar_solve(f);
   denormalisation.apply_to(*this);
 
@@ -197,8 +198,6 @@ Eigen::Matrix4d MotionMatrix<V>::diac_euclidean_lift(int nCameras, const ImageTr
   y.resize(4*F + 3*(nCameras-F) + V + 1);
   y.fill(0.0);
   i = 0;
-  j = 0;
-
   for(j = 0; j < V; ++j) {
     if(j<F) {
       // --- constrains for known intrinsics:
@@ -247,8 +246,8 @@ Eigen::Matrix4d MotionMatrix<V>::diac_euclidean_lift(int nCameras, const ImageTr
 
   x = coeffs.jacobiSvd(Eigen::ComputeFullU | Eigen::ComputeFullV).solve(y);
 
-  std::cout << "coeffs*x = " << std::endl;
-  std::cout << coeffs*x << std::endl;
+  std::cout << "Euclidean lift rms error on 1st pass = " << std::endl;
+  std::cout << (coeffs*x - y).norm() << std::endl;
 
   k = 0;
   for(i = 0; i<4; ++i) {
@@ -259,9 +258,9 @@ Eigen::Matrix4d MotionMatrix<V>::diac_euclidean_lift(int nCameras, const ImageTr
   }
 
   // --- re-weight the coefficients and solve again
-  int weight;
+  double weight;
   i = 0;
-  for(j=1; j<V; ++j) {
+  for(j=0; j<V; ++j) {
     weight = 1.0/(view(j) * Q * view(j).transpose())(2,2);
     if(j<F) {
       coeffs.middleRows<5>(i) *= weight;
@@ -279,8 +278,8 @@ Eigen::Matrix4d MotionMatrix<V>::diac_euclidean_lift(int nCameras, const ImageTr
 
   x = coeffs.jacobiSvd(Eigen::ComputeFullU | Eigen::ComputeFullV).solve(y);
 
-  std::cout << "coeffs*x = " << std::endl;
-  std::cout << coeffs*x << std::endl;
+  std::cout << "Euclidean lift rms error on 2nd pass = " << std::endl;
+  std::cout << (coeffs*x - y).norm() << std::endl;
 
   k = 0;
   for(i = 0; i<4; ++i) {
