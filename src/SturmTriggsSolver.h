@@ -51,12 +51,14 @@ public:
 
 protected:
   void	random_permute(std::vector<int> &);
+  void	set_measurement_matrix(const MeasurementMatrix<M> &);
 
 protected:
   MeasurementMatrix<M> 		measurement;
   MotionMatrix<M> & 		motion;
   ShapeMatrix &			shape;
   Eigen::Matrix<int,M,1>	spanning_tree;      // tree of views
+  Eigen::Matrix<int,M,1>	tree_traversal;      // tree of views
 };
 
 #include "SturmTriggsSolver.hpp"

@@ -42,7 +42,7 @@ void SturmTriggsSolver<M>::solve(const MeasurementMatrix<M> &E) {
   Eigen::JacobiSVD<typename MeasurementMatrix<M>::Base> 	svd;
   ImageTransform<M>				denormalisation;
 
-  measurement = E;
+  set_measurement_matrix(E);
   measurement.normalise(denormalisation);
 
   std::cout << "Normalised measurement norm =" << std::endl;
@@ -97,14 +97,6 @@ void SturmTriggsSolver<M>::factorise_with_occlusions(MotionMatrix<M> &motion,
   random_permute(permutation);
   std::sort(permutation.begin(), permutation.end(), *this);
 
-  std::cout << "Permuted measurement =" << std::endl;
-  for(j = 0; j<permutation.size(); ++j) {
-    for(i = 0; i<M; ++i) {
-      std::cout << (measurement(3*i+2,permutation[j]) != 0) << " ";
-    }
-    std::cout << std::endl;
-  }
-
   // --- calculate motion matrix
   // --- from subspace constraints
   // -----------------------------
@@ -112,23 +104,7 @@ void SturmTriggsSolver<M>::factorise_with_occlusions(MotionMatrix<M> &motion,
   nmRank = 0;
   while(c < permutation.size()-4) {
 
-    std::cout << "Forming subspace from =" << std::endl;
-    for(j = 0; j<4; ++j) {
-      for(i = 0; i<M; ++i) {
-	std::cout << (measurement(3*i+2,permutation[c+j]) != 0) << " ";
-      }
-      std::cout << std::endl;
-    }    
-
     form_subspace(permutation.begin() + c, subspace);
-
-    std::cout << "Subspace is =" << std::endl;
-    for(j = 0; j<subspace.cols(); ++j) {
-      for(i = 0; i<M; ++i) {
-	std::cout << (subspace(3*i+2,j) != 0) << " ";
-      }
-      std::cout << std::endl;
-    }    
 
     if(subspace.cols() < 3*M-1) {
       subspaceSvd.compute(subspace, Eigen::ComputeFullU);
@@ -137,66 +113,31 @@ void SturmTriggsSolver<M>::factorise_with_occlusions(MotionMatrix<M> &motion,
 	notMotion.new_columns(3*M-subspace.cols());
 	notMotion.rightCols(3*M-subspace.cols()) = 
 	  subspaceSvd.matrixU().rightCols(3*M-subspace.cols());
-	c += 4;
-	std::cout << "Added contraint to notmotion" << std::endl;
-	std::cout << "Singular vals = " << notMotion.jacobiSvd().singularValues().transpose() << std::endl;
+	//	c += 4;
+	c += 1;
       } else {
-	c += 2;
+	//	c += 2;
+	c += 1;
       }
     } else {
-      c += 2;
+      // c += 2;
+      c += 1;
     }
   }
 
-  /******
-  while(c < permutation.size()) {
-    // --- create constraint
-    for(j = 0; c<measurement.cols() && j<4; ++j) {
-      subspace.delete_columns(0,subspace.cols());
-      // --- add a column to subspace
-      j0 = subspace.insert_column_and_expand(measurement.col(c));
-      ++c;
-      srank = subspace.rank(singular_cutoff);
-      // --- subspace must be of full rank
-      while(c<measurement.cols() && srank < subspace.cols() && srank < 3*M) {
-	subspace.delete_columns(j0, subspace.cols()-j0);
-	j0 = subspace.insert_column_and_expand(measurement.col(c));
-	srank = subspace.rank(singular_cutoff);
-	++c;
-      }
-    }
-
-    // --- add nullspace of subspace to notMotion
-    // --- if it is a meaningful constraint
-    if(j == 4 && subspace.cols() < 3*M) {
-      notMotion.new_columns(3*M-subspace.cols());
-      notMotion.rightCols(3*M-subspace.cols()) = subspace.jacobiSvd(Eigen::ComputeFullU).matrixU().rightCols(3*M-subspace.cols());
-
-      nmRank = notMotion.rank(singular_cutoff); // test
-      //      std::cout << "nmRank = " << nmRank << std::endl;
-
-    }
+  if(notMotion.cols() < 3*M-4) {
+    throw("Couldn't gather enough information to fill in the Measurement matrix.");
   }
 
-  if(nmRank < 3*M-4) {
+  subspaceSvd.compute(notMotion, Eigen::ComputeFullU);
+  if(subspaceSvd.singularValues()(3*M-5) < singular_cutoff) {
     std::cout << "Not motion singular values " << std::endl 
-	      << notMotion.jacobiSvd().singularValues() << std::endl;
+	      << subspaceSvd.singularValues() << std::endl;
     throw("Too many occlusions to fill in the Measurement matrix.");
   }
 
-  ****/  
-
   // --- motion is approximate nullspace of the complement
-  motion = notMotion.jacobiSvd(Eigen::ComputeFullU).matrixU().rightCols(4);
-
-  // --- remove 'unscalable' flags in measurement matrix
-  for(i = 0; i<M; ++i) {
-    for(j = 0; j<measurement.cols(); ++j) {
-      if(measurement.pixel(i,j)(2) == 0.0 && std::signbit(measurement.pixel(i,j)(2)) != 0) {
-	measurement.pixel(i,j)(2) = 1.0;
-      }
-    }
-  }
+  motion = subspaceSvd.matrixU().rightCols(4);
 
   shape.solve(measurement, motion);
 }
@@ -232,6 +173,7 @@ create_connectivity_graph(Eigen::Matrix<double,M,M> &G) {
   }
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 /// Approximates the scaling of '*this' by forming the fundamental
 /// matrices, as described in Sturm and Triggs (1996). The views are
@@ -240,30 +182,16 @@ create_connectivity_graph(Eigen::Matrix<double,M,M> &G) {
 ///////////////////////////////////////////////////////////////////////////////
 template<int M>
 void SturmTriggsSolver<M>::approx_scale() {
-  AdjacencyMatrix<M> 		view_connections;   // graph of views
-  int				tree_root;          
-  Eigen::Matrix<bool,M,1>	scaled;		    // is this view scaled
   Eigen::Vector3d		cross_prod, pix;    
-  int				v,pt,parent;
-  bool				updated; 
+  int				v,pt,parent,i;
   double			scale;
-  double			parent_scale, child_scale;
   FundamentalMatrix		F[M];
-  ImageTransform<M>		denormalisation;
-
-  // --- create spanning tree of views
-  // ---------------------------------
-  create_connectivity_graph(view_connections);
-  view_connections.shortest_spanning_tree(tree_root, spanning_tree);
-  scaled.fill(false);
-  scaled(tree_root) = true;
-  std::cout << "Spanning tree = " << std::endl << spanning_tree << std::endl; 
 
   // --- create fundamental matrices for
   // --- each edge in the spanning tree 
   // ----------------------------------
   for(v = 0; v<M; ++v) {
-    if(v != tree_root) {
+    if(v != tree_traversal(0)) {
       F[v].eight_point_algorithm(measurement.view(v),
 				 measurement.view(spanning_tree(v)));      
     }
@@ -271,33 +199,24 @@ void SturmTriggsSolver<M>::approx_scale() {
 
   // --- Do scaling over tree
   // ------------------------
-  updated = true;
-  while(updated) {
-    updated = false;
-    for(v = 0; v<M; ++v) {
-      parent = spanning_tree(v);
-      if(!scaled(v) && scaled(parent)) {
-	// --- scale between v and parent of v
-	for(pt = 0; pt<measurement.cols(); ++pt) {
-	  if(!measurement.pixel_is_occluded(v,pt)) {
-	    if(!measurement.pixel_is_occluded(parent,pt)) {
-	      pix        = measurement.pixel(v,pt);
-	      cross_prod = F[v].e_ij().cross(pix);
-	      scale      = 
-		cross_prod.dot(F[v]*measurement.pixel(parent,pt))/
-		cross_prod.dot(cross_prod);
-	      measurement.pixel(v,pt) *= scale;
-	    } else {
-	      // --- parent occluded
-	      // --- so start scale at 1.0 again
-	      // --- for later separation
-	      measurement.pixel(v,pt) /= measurement.pixel(v,pt)(2);
-	      // measurement.pixel(v,pt)(2) = -0.0;
-	    }
-	  }
+  for(v = 1; v<M; ++v) {
+    i = tree_traversal(v);
+    parent = spanning_tree(i);
+    // --- scale between i and parent of i
+    for(pt = 0; pt<measurement.cols(); ++pt) {
+      if(!measurement.pixel_is_occluded(i,pt)) {
+	if(!measurement.pixel_is_occluded(parent,pt)) {
+	  pix        = measurement.pixel(i,pt);
+	  cross_prod = F[i].e_ij().cross(pix);
+	  scale      = 
+	    cross_prod.dot(F[i]*measurement.pixel(parent,pt))/
+	    cross_prod.dot(cross_prod);
+	  measurement.pixel(i,pt) *= scale;
+	} else {
+	  // --- parent occluded so scale to 1.0
+	  // --- for later separation
+	  measurement.pixel(i,pt) /= measurement.pixel(i,pt)(2);
 	}
-	scaled(v) = true;
-	updated = true;
       }
     }
   }
@@ -353,105 +272,92 @@ bool SturmTriggsSolver<M>::operator ()(int j1, int j2) {
 template<int M>
 void SturmTriggsSolver<M>::form_subspace(std::vector<int>::iterator cBegin,
 					 MeasurementMatrix<M> &subspace) {
-  int i,j,k;
+  int 				v,i,j,k;
   std::vector<int>::iterator 	cEnd = cBegin+4;
   std::vector<int>::iterator 	colIt;
-  Eigen::Matrix<bool,M,4>	leafExpanded; // single pixel on its own?
+  Eigen::Matrix<bool,M,4>	soloPixel; // single pixel on its own?
   Eigen::Matrix<bool,M,1>	occluded;
   Eigen::Matrix<int,M,1>	colPosition;	
   bool				updated;
   int				colCount;
+  int				parent;
 
-  // --- first calculate total number of columns we need
-  // --- and map out expansions:
-  // --- occluded     - true if row is occluded
-  // --- leafExpanded - true if i'th row of jth col is expanded
-  // ---                to one pixel on its own.
-  
   colCount = 0;
+
+  // --- First calculate occlusions
+  // --- occluded     - true if row is occluded
   for(i = 0; i<M; ++i) {
     occluded(i) = false;
-    j = 0;
     for(colIt = cBegin; colIt != cEnd; ++colIt) {
-      leafExpanded(i,j) = false;
-      if(measurement.pixel_is_occluded(i,*colIt)) {
-	if(!occluded(i)) {
-	  occluded(i) = true;
-	  colCount += 3;
-	}
-      } else if(spanning_tree(i) == -1 || 
-		measurement.pixel_is_occluded(spanning_tree(i),*colIt)) {
-	leafExpanded(i,j) = true;
-	colCount += 1;
-      } else {
-	leafExpanded(spanning_tree(i),j) = false;
+      if(measurement.pixel_is_occluded(i,*colIt) && !occluded(i)) {
+	occluded(i) = true;
+	colCount += 3;
       }
-      ++j;
+    }    
+  }
+
+  // --- Now find positions of columns
+  // --- with one pixel on its own.
+  soloPixel.fill(false);
+  for(v = 0; v<M; ++v) {
+    i = tree_traversal(v);
+    if(!occluded(i)) {
+      j = 0;
+      for(colIt = cBegin; colIt != cEnd; ++colIt) {
+	if(spanning_tree(i) == -1 || occluded(spanning_tree(i))) {
+	  soloPixel(i,j) = true;
+	  colCount += 1;
+	} else {
+	  soloPixel(spanning_tree(i),j) = false;
+	}
+	++j;
+      }
     }
   }
-  // --- remove redundant leaf expansions
-  // --- (4xleaves and leaves in occluded rows)
+
+  // --- remove redundant solo-pixel expansions
+  // --- (4 x solo pixels in one row)
   for(i = 0; i<M; ++i) {
-    if(occluded(i)) {
-      for(j = 0; j<4; ++j) {
-	if(leafExpanded(i,j)) {
-	  colCount -= 1;
-	}
-      }
-    } else {
-      if(leafExpanded.row(i).sum() == 4) {
-	occluded(i) = true;
-	colCount -= 1;
-      }
+    if(!occluded(i) &&
+       soloPixel.row(i) == Eigen::Matrix<bool,1,4>(true,true,true,true)) {
+      occluded(i) = true;
+      colCount -= 1;
     }
   }
   
-  std::cout << "Occluded = " << occluded.transpose() << std::endl;
-  std::cout << "Leaf expanded = " << std::endl << leafExpanded << std::endl;
-  std::cout << "ColCount = " << colCount << std::endl;
+  // std::cout << "Occluded = " << occluded.transpose() << std::endl;
+  // std::cout << "Solo pixels = " << std::endl << soloPixel << std::endl;
+  // std::cout << "ColCount = " << colCount << std::endl;
 
   // --- now create subspace
   // --- column by column
   subspace.resize(3*M, colCount);
   subspace.setZero();
   j = 0;
-  k = 0;
   for(colIt = cBegin; colIt != cEnd; ++colIt) {
-    colPosition.fill(-1);
-    do {
-      updated = false;
-      for(i = 0; i<M; ++i) {
-	std::cout << "Starting " << i << " " << *colIt << " " << j << std::endl;
-	if(colPosition(i) == -1) {
-	  if(!(occluded(i) && leafExpanded(i,k))) {
-	    if(!measurement.pixel_is_occluded(i,*colIt) &&
-	       (spanning_tree(i) == -1 ||
-		measurement.pixel_is_occluded(spanning_tree(i),*colIt))) {
-	      // --- start a new column
-	      std::cout << "Starting new column" << std::endl;
-	      subspace.pixel(i,j) = measurement.pixel(i,*colIt);
-	      colPosition(i) = j;
-	      updated = true;
-	      ++j;
-	    } else if(colPosition(spanning_tree(i)) != -1) {
-	      // --- add to an existing column
-	      std::cout << "Adding to column column" << std::endl;
-	      colPosition(i) = colPosition(spanning_tree(i));
-	      subspace.pixel(i,colPosition(i)) = measurement.pixel(i,*colIt);
-	      updated = true;
-	    }
-	  }
+    for(v = 0; v<M; ++v) {
+      i = tree_traversal(v);
+      if(!occluded(i)) {
+	parent = spanning_tree(i);
+	if(parent == -1 || occluded(parent)) {
+	  // --- start a new column
+	  subspace.pixel(i,j) = measurement.pixel(i,*colIt);
+	  colPosition(i) = j;
+	  updated = true;
+	  ++j;
+	} else {
+	  // --- add to an existing column
+	  colPosition(i) = colPosition(parent);
+	  subspace.pixel(i,colPosition(i)) = measurement.pixel(i,*colIt);
+	  updated = true;
 	}
       }
-    } while(updated);
-    ++k;
+    }
   }
 
-  std::cout << "Setting occlusions " << std::endl;
   //--- now add occlusion expansions
   for(i = 0; i<M; ++i) {
     if(occluded(i)) {
-      std::cout << "Setting occlusion " << i << std::endl;
       subspace.template block<3,3>(3*i,j).setIdentity();
       j += 3;
     }
@@ -473,4 +379,37 @@ void SturmTriggsSolver<M>::random_permute(std::vector<int> &p) {
     p[j] = p[i];
     p[i] = d;
   }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+/// Takes a copy of the measurement matrix and builds a spanning tree of views
+///////////////////////////////////////////////////////////////////////////////
+template<int M>
+void SturmTriggsSolver<M>::set_measurement_matrix(const MeasurementMatrix<M> &E) {
+  AdjacencyMatrix<M> 		view_connections;   // graph of views
+  Eigen::Matrix<bool,M,1>	visited;	    // has this view been visited
+  int				v,i;
+  int				treeRoot;
+  bool				updated;
+
+  measurement = E;
+
+  create_connectivity_graph(view_connections);
+  view_connections.shortest_spanning_tree(treeRoot, spanning_tree);
+  std::cout << "Spanning tree = " << std::endl << spanning_tree << std::endl; 
+  visited.fill(false);
+  visited(treeRoot) = true;
+  tree_traversal(0) = treeRoot;
+  v = 1;
+  do {
+    updated = false;	
+    for(i = 0; i<M; ++i) {
+      if(!visited(i) && visited(spanning_tree(i))) {
+	tree_traversal(v++) = i;
+	visited(i) = true;
+	updated = true;
+      }
+    }
+  } while(updated);
 }

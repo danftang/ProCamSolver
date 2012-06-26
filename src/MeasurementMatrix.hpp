@@ -255,13 +255,16 @@ template<int M>
 void MeasurementMatrix<M>::synthesise_measurements(const MotionMatrix<M> &P, 
 						  int pts, double noise) {
   ShapeMatrix	 	X;
-  Eigen::Matrix4d	shift;	
-  Eigen::RowVectorXd	noiseVec;
-  int 			i;
+  Eigen::Matrix4d	shift;
+  int 			i,j;
 
   // --- fill X with homogeneous 3D points centred around origin
   X.resize(4,pts);
-  X = ShapeMatrix::Random(4,pts);
+  for(i = 0; i<3; ++i) {
+    for(j = 0; j<X.cols(); ++j) {
+      X(i,j) = rand()*2.0/RAND_MAX - 1.0;
+    }
+  }
   X.row(3).fill(1.0);
   
   // --- shift centre to (0,0,1.5)
@@ -272,12 +275,11 @@ void MeasurementMatrix<M>::synthesise_measurements(const MotionMatrix<M> &P,
   // --- form matrix and add noise
   (*this) = P*X;
   unscale();
-  noiseVec.resize(cols());
   for(i = 0; i<M; ++i) {
-    noiseVec = Eigen::RowVectorXd::Random(cols())*noise;
-    row(3*i) += noiseVec;
-    noiseVec = Eigen::RowVectorXd::Random(cols())*noise;
-    row(3*i+1) += noiseVec;
+    for(j = 0; j<cols(); ++j) {
+      (*this)(3*i,j) += 2.0*rand()*noise/RAND_MAX - noise;
+      (*this)(3*i+1,j) += 2.0*rand()*noise/RAND_MAX - noise;
+    }
   }
 }
 

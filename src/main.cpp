@@ -8,8 +8,8 @@
 using namespace Eigen;
 
 int main() {
-  const int 			N = 4;			// number of cameras
-  const int 			F = 2;			// number of fixed cams
+  const int 			N = 5;			// number of cameras
+  const int 			F = 0;			// number of fixed cams
   MotionMatrix<N>		cameras;		// camera matrices
   MotionMatrix<N>		reconstruction;		// camera matrices
   ShapeMatrix			shape;			// 3D-points
@@ -45,20 +45,15 @@ int main() {
   cameras.M(3) = 		K * R;
   cameras.T(3) = 		Vector3d(3.0, -1.0, 0.1);
 
-  /***
   K = Translation2d(0,0.25) * Scaling(1.0123);
   R = AngleAxisd(-0.1,Vector3d::UnitX()) *
       AngleAxisd(0.1,Vector3d::UnitY()) * 
       AngleAxisd(-0.1,Vector3d::UnitZ());
   cameras.M(4) = 		K * R;
   cameras.T(4) = 		Vector3d(4.0, -1.0, -0.1);
-  ****/
 
   std::cout << "Original MotionMatrix = " << std::endl;
   std::cout << cameras << std::endl;
-
-  std::cout << "Fixing intrinsics to " << std::endl 
-	    << fixedIntrinsics << std::endl;
 
   // --- synthesise a vector of pixel correspondences
   // ------------------------------------------------
@@ -66,10 +61,11 @@ int main() {
   Eigen::VectorXd err;
   int i;
 
-  correspondences.synthesise_measurements(cameras, 100, 0.0);
-  correspondences.synthesise_occlusions(0.5);
+  correspondences.synthesise_measurements(cameras, 2000, 0.001);
+  correspondences.synthesise_occlusions(0.25);
 
   std::cout << "Original Correspondence norm = " << std::endl;
+  // std::cout << correspondences << std::endl;
   std::cout << correspondences.rowwise().norm() << std::endl;
 
   reconstruction.svd_solve(correspondences);
@@ -87,30 +83,27 @@ int main() {
 
   reconstruction.reprojection_err(correspondences, err);
   std::cout << "SVD reprojection err = " << std::endl;
-  std::cout << err.norm()/(correspondences.cols()*N*2.0*(1.0-0.08))<<std::endl;
+  std::cout << err.norm()/sqrt(err.rows())<<std::endl;
 
   std::cout << "Reconstructed camera matrix =" << std::endl;
   std::cout << reconstruction << std::endl;
-  skew = reconstruction.KR_decompose(Ks,Rs);
+  reconstruction.KR_decompose(Ks,Rs);
   std::cout << "Intrinsics are" << std::endl;
   std::cout << Ks << std::endl;
   std::cout << "Rotations are" << std::endl;
   std::cout << Rs << std::endl;
 
-  /******
-  reconstruction = cameras;
-  reconstruction += MotionMatrix<N>::Random()*0.001;
-  reconstruction.view(0) = cameras.view(0);
+  //reconstruction = cameras;
+  //reconstruction += MotionMatrix<N>::Random()*0.001;
+  //reconstruction.view(0) = cameras.view(0);
 
   std::cout << "Starting Bundle Adjustment" << std::endl;
 
-  reconstruction.bundle_adjust(1, correspondences);
-
-  shape.solve(correspondences, reconstruction);
+  reconstruction.bundle_adjust(0, correspondences);
 
   reconstruction.reprojection_err(correspondences, err);
   std::cout << "Adjusted reprojection err = " << std::endl;
-  std::cout << err.norm()/(correspondences.cols()*N*2.0*(1.0-0.08))<<std::endl;
+  std::cout << err.norm()/sqrt(err.rows())<<std::endl;
 
   std::cout << "Adjusted camera matrix =" << std::endl;
   std::cout << reconstruction << std::endl;
@@ -119,7 +112,6 @@ int main() {
   std::cout << Ks << std::endl;
   std::cout << "Rotations are" << std::endl;
   std::cout << Rs << std::endl;
-  *****/
 
   return(0);
 }

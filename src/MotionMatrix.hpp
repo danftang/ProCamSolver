@@ -128,10 +128,10 @@ double MotionMatrix<V>::bundle_adjust(int f, const MeasurementMatrix<V> &measure
   ImageTransform<V>	denormalisation;
   BundleAdjuster<V>	ba_solver(scaledMeasurement, *this);
 
-  scaledMeasurement.normalise(denormalisation, true);
-  denormalisation.apply_inverse_to(*this);
+  // scaledMeasurement.normalise(denormalisation, true);
+  // denormalisation.apply_inverse_to(*this);
   ba_solver.levmar_solve(f);
-  denormalisation.apply_to(*this);
+  // denormalisation.apply_to(*this);
 
   reprojection_err(measurement, err);
   return(err.norm());
@@ -566,8 +566,15 @@ void MotionMatrix<V>::reprojection_err(
   int 				i,j,n;
   Eigen::Matrix<double, 3*V, 1>	reproj;
   ShapeMatrix 			shape;
+  bool				resizeErr;
 
-  if(err.size() == 0)  err.resize(2*V*E.cols());
+  if(err.size() == 0) {
+    err.resize(2*V*E.cols());
+    resizeErr = true;
+  } else {
+    resizeErr = false;
+  }
+
   shape.solve(E, *this);
   n = 0;
   for(j=0; j<E.cols(); ++j) {
@@ -579,8 +586,13 @@ void MotionMatrix<V>::reprojection_err(
       }
     }
   }
-  while(n < err.size()) {
-    err(n++) = 0.0;
+
+  if(resizeErr) {
+    err.conservativeResize(n);
+  } else {
+    while(n < err.size()) {
+      err(n++) = 0.0;
+    }
   }
 }
 

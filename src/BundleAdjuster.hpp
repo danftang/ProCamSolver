@@ -55,7 +55,7 @@ int BundleAdjuster<M>::operator()(const Eigen::VectorXd &params,
   //std::cout << "Size error = " << errs(errs.size()-1) << std::endl;
   //std::cout << "Reprojection error = " << std::endl;
   //std::cout << errs << std::endl;
-  std::cout << "Err = " << errs.norm()/errs.rows() << std::endl;
+  std::cout << "Err = " << errs.norm()/sqrt(errs.rows()) << std::endl;
   return(0);
 }
 
@@ -96,12 +96,15 @@ Eigen::AngleAxisd BundleAdjuster<M>::rotation_to_angleaxis(constBlock3 rot) {
 ///////////////////////////////////////////////////////////////////////////////
 template<int M>
 Eigen::Vector3d BundleAdjuster<M>::angleaxis_to_rotation(const Eigen::AngleAxisd &A){
-  return(Eigen::Vector3d(A.angle(), 
-			 std::atan(A.axis()(1)/A.axis()(0)),
-			 std::atan(A.axis()(2)/sqrt(A.axis()(0)*A.axis()(0) + 
-						    A.axis()(1)*A.axis()(1)))
-			 )
-	 );
+  double psi;
+  double phi;
+  phi = std::asin(A.axis()(2));
+  if(A.axis()(1) >= 0.0) {
+    psi = std::acos(A.axis()(0)/std::cos(phi));
+  } else {
+    psi = -std::acos(A.axis()(0)/std::cos(phi));
+  }
+  return(Eigen::Vector3d(A.angle(), psi, phi));
 }
 
 
@@ -231,6 +234,7 @@ void BundleAdjuster<M>::matrices_to_params() {
 
   // --- normalise scale of translations
   translation_norm = sqrt(translation_norm);
+  motion.T(0) /= M/translation_norm;
   for(v = 1; v<M; ++v) {
     translation(v, variableParams) *= M/translation_norm;
   }
@@ -280,11 +284,18 @@ int BundleAdjuster<M>::levmar_solve(int nFixedIntrinsics) {
   params_to_matrices(variableParams);
   std::cout << "Parameterised motion matrix = " << std::endl;
   std::cout << motion << std::endl;
+  ImageTransform<M>		Ks,Rs;
+  motion.KR_decompose(Ks,Rs);
+  std::cout << "Intrinsics are" << std::endl;
+  std::cout << Ks << std::endl;
+  std::cout << "Rotations are" << std::endl;
+  std::cout << Rs << std::endl;
+
 
   Eigen::VectorXd tmperr;
   motion.reprojection_err(measurement, tmperr);
   std::cout << "Parameterised reprojection err = " << std::endl;
-  std::cout << tmperr.norm()/(2.0*nPixels) << std::endl;
+  std::cout << tmperr.norm()/sqrt(2.0*nPixels) << std::endl;
 
   // --- do solve
   std::cout << "Starting solve with params = " << std::endl;
@@ -295,7 +306,7 @@ int BundleAdjuster<M>::levmar_solve(int nFixedIntrinsics) {
 
   motion.reprojection_err(measurement, tmperr);
   std::cout << "Final reprojection err = " << std::endl;
-  std::cout << tmperr.norm()/(2.0*nPixels) << std::endl;
+  std::cout << tmperr.norm()/sqrt(2.0*nPixels) << std::endl;
 
   return(info);
 }
