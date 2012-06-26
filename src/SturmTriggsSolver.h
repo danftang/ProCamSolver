@@ -47,7 +47,13 @@ public:
   void	create_connectivity_graph(Eigen::Matrix<double,M,M> &);
   void  form_subspace(std::vector<int>::iterator, MeasurementMatrix<M> &);
 
-  bool operator ()(int, int);
+  class colCompare {
+  public:
+    colCompare(MeasurementMatrix<M> &m) : measurement(m) {};
+    bool operator ()(int, int);
+  protected:
+    MeasurementMatrix<M> &measurement;
+  };
 
 protected:
   void	random_permute(std::vector<int> &);

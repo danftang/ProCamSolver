@@ -1,7 +1,7 @@
 # My Makefile
 
-#MAIN = mainTest.o
-MAIN = main.o
+MAIN = mainTest.o
+#MAIN = main.o
 OBJS = FundamentalMatrix.o
 #OBJS = staticMeasurementMatrix.o staticMotionMatrix.o staticStrumTriggsSolver.o
 #CPPFLAGS = -O3 -frepo

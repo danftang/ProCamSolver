@@ -1,4 +1,4 @@
-##ProcCamSolver 0.1
+##ProCamSolver 0.1
 
 This is a C++ library for reconstructing a 3D scene from a number of 2D images of the scene and calculating the position/orientation/intrinsics of each image. It is assumed that a set of pixel correspondences has already been calculated (that is, we have pairs of pixels, one from each of two different images, that point to the same 3D point - although the coordinates of the 3D point and the position/orientation/intrinsics of the images need not be known).
 

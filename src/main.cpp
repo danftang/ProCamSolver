@@ -61,7 +61,7 @@ int main() {
   Eigen::VectorXd err;
   int i;
 
-  correspondences.synthesise_measurements(cameras, 2000, 0.001);
+  correspondences.synthesise_measurements(cameras, 1000, 0.001);
   correspondences.synthesise_occlusions(0.25);
 
   std::cout << "Original Correspondence norm = " << std::endl;
@@ -97,6 +97,7 @@ int main() {
   //reconstruction += MotionMatrix<N>::Random()*0.001;
   //reconstruction.view(0) = cameras.view(0);
 
+  /*****
   std::cout << "Starting Bundle Adjustment" << std::endl;
 
   reconstruction.bundle_adjust(0, correspondences);
@@ -112,6 +113,6 @@ int main() {
   std::cout << Ks << std::endl;
   std::cout << "Rotations are" << std::endl;
   std::cout << Rs << std::endl;
-
+  ****/
   return(0);
 }

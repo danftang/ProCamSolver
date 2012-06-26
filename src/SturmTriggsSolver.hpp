@@ -46,7 +46,7 @@ void SturmTriggsSolver<M>::solve(const MeasurementMatrix<M> &E) {
   measurement.normalise(denormalisation);
 
   std::cout << "Normalised measurement norm =" << std::endl;
-  std::cout << measurement.rowwise().norm() << std::endl;
+  std::cout << measurement.rowwise().norm()/sqrt(measurement.cols()) << std::endl;
 
   approx_scale();
   factorise_with_occlusions(motion, shape);
@@ -54,7 +54,12 @@ void SturmTriggsSolver<M>::solve(const MeasurementMatrix<M> &E) {
   std::cout << "First guess at motion matrix = " << std::endl;
   std::cout << motion << std::endl;
   std::cout << "shapenorm = " << std::endl;
-  std::cout << shape.rowwise().norm() << std::endl;
+  std::cout << shape.rowwise().norm()/sqrt(shape.cols()) << std::endl;
+
+  Eigen::VectorXd err;
+  motion.reprojection_err(measurement, err);
+  std::cout << "Normalised reprojection err = " << std::endl;
+  std::cout << err.norm()/sqrt(err.rows())<<std::endl;
 
   measurement.scale_and_fill(motion, shape);
   svd.compute(measurement, Eigen::ComputeThinV | Eigen::ComputeThinU);
@@ -86,7 +91,7 @@ void SturmTriggsSolver<M>::factorise_with_occlusions(MotionMatrix<M> &motion,
   int 			c;
   int			srank;
   int			nmRank;
-  const double	singular_cutoff=0.001;	// cutoff value for rank calculation
+  const double	singular_cutoff=0.01;	// cutoff value for rank calculation
 
   // --- calculate the best permutation of
   // --- columns of the measurement matrix
@@ -94,8 +99,11 @@ void SturmTriggsSolver<M>::factorise_with_occlusions(MotionMatrix<M> &motion,
   for(i=0; i<permutation.size(); ++i) {
     permutation[i] = i;
   }
+  std::cout << "Permuting..." << std::endl;
   random_permute(permutation);
-  std::sort(permutation.begin(), permutation.end(), *this);
+  std::cout << "Sorting..." << std::endl;
+  std::sort(permutation.begin(), permutation.end(), colCompare(measurement));
+  std::cout << "Forming subspaces..." << std::endl;
 
   // --- calculate motion matrix
   // --- from subspace constraints
@@ -108,11 +116,17 @@ void SturmTriggsSolver<M>::factorise_with_occlusions(MotionMatrix<M> &motion,
 
     if(subspace.cols() < 3*M-1) {
       subspaceSvd.compute(subspace, Eigen::ComputeFullU);
-      if(subspaceSvd.singularValues()(subspace.cols()-1) > singular_cutoff) {
+      if(subspaceSvd.singularValues()(subspace.cols()-1)/subspaceSvd.singularValues()(0) > singular_cutoff) {
 	// -- found full rank subspace
 	notMotion.new_columns(3*M-subspace.cols());
 	notMotion.rightCols(3*M-subspace.cols()) = 
 	  subspaceSvd.matrixU().rightCols(3*M-subspace.cols());
+
+	//	std::cout << "Subspace singular values = " << std::endl 
+	//  << subspaceSvd.singularValues() << std::endl;
+	//std::cout << "NotMotion singular values = " << std::endl 
+	//<< notMotion.jacobiSvd().singularValues() << std::endl;
+
 	//	c += 4;
 	c += 1;
       } else {
@@ -131,10 +145,12 @@ void SturmTriggsSolver<M>::factorise_with_occlusions(MotionMatrix<M> &motion,
 
   subspaceSvd.compute(notMotion, Eigen::ComputeFullU);
   if(subspaceSvd.singularValues()(3*M-5) < singular_cutoff) {
-    std::cout << "Not motion singular values " << std::endl 
-	      << subspaceSvd.singularValues() << std::endl;
     throw("Too many occlusions to fill in the Measurement matrix.");
   }
+
+  std::cout << "NotMotion singular values = " << std::endl 
+	    << subspaceSvd.singularValues() << std::endl;
+
 
   // --- motion is approximate nullspace of the complement
   motion = subspaceSvd.matrixU().rightCols(4);
@@ -193,7 +209,9 @@ void SturmTriggsSolver<M>::approx_scale() {
   for(v = 0; v<M; ++v) {
     if(v != tree_traversal(0)) {
       F[v].eight_point_algorithm(measurement.view(v),
-				 measurement.view(spanning_tree(v)));      
+				 measurement.view(spanning_tree(v)));
+      F[v].remove_outliers(measurement.view(v),
+			   measurement.view(spanning_tree(v)), 3.0);
     }
   }
 
@@ -247,7 +265,7 @@ void SturmTriggsSolver<M>::approx_scale() {
 ///
 ///////////////////////////////////////////////////////////////////////////////
 template<int M>
-bool SturmTriggsSolver<M>::operator ()(int j1, int j2) {
+bool SturmTriggsSolver<M>::colCompare::operator ()(int j1, int j2) {
   int i;
   bool b1, b2;
 
@@ -261,6 +279,7 @@ bool SturmTriggsSolver<M>::operator ()(int j1, int j2) {
     if(!b1 && b2) return(true);
     if(b1 && !b2) return(false);
   }
+
 
   // --- must be the equivalent
   return(false);

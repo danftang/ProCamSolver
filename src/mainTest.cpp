@@ -33,14 +33,14 @@ int main() {
     std::cout << "SVD reconstructed camera matrix =" << std::endl;
     std::cout << reconstruction << std::endl;
 
-    H = reconstruction.diac_euclidean_lift(3);
+    H = reconstruction.diac_euclidean_lift(5);
     reconstruction *= H;
     std::cout << "Projective transform =" << std::endl;
     std::cout << H << std::endl;
 
     reconstruction.reprojection_err(correspondences, err);
     std::cout << "SVD reprojection err = " << std::endl;
-    std::cout << err.norm()/(correspondences.cols()*N*2.0*(1.0-0.08))<<std::endl;
+    std::cout << err.norm()/sqrt(err.rows())<<std::endl;
 
     std::cout << "Reconstructed camera matrix =" << std::endl;
     std::cout << reconstruction << std::endl;

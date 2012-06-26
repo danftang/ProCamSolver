@@ -30,7 +30,13 @@ public:
   template<class DERIVED1, class DERIVED2>
   void  eight_point_algorithm(const Eigen::MatrixBase<DERIVED1> &,
 			      const Eigen::MatrixBase<DERIVED2> &);
+
   void	calc_epipoles_and_constrain();
+
+  template<class D1, class D2>
+  void  remove_outliers(const Eigen::MatrixBase<D1> &,
+			const Eigen::MatrixBase<D2> &, const double &);
+  
   const Eigen::Vector3d & e_ij() 			{return(eij);}
   const Eigen::Vector3d & e_ji()			{return(eji);}
 
@@ -124,9 +130,52 @@ eight_point_algorithm(const Eigen::MatrixBase<DERIVED1> &a,
   // ---------------------------------
   calc_epipoles_and_constrain();
 
-  // std::cout << "Residual in eight_point_algorithm = " << std::endl;
-  // std::cout << (a.transpose() * (*this) * b).diagonal() << std::endl;
+  //std::cout << "Residual in eight_point_algorithm = " << std::endl;
+  //std::cout << (a.transpose() * (*this) * b).diagonal().transpose() << std::endl;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+template<class D1, class D2>
+void FundamentalMatrix::
+remove_outliers(const Eigen::MatrixBase<D1> &a,
+		const Eigen::MatrixBase<D2> &b,
+		const double &max_err) {
+  Eigen::VectorXd 	e; 		// a^T F b = e
+  double		e_sum;
+  double		e2_sum;
+  double 		sigma;
+  int			i;
+  int			n;
+
+  e.resize(a.cols());
+  e.setZero();
+  n = 0;
+  for(i = 0; i<a.cols(); ++i) {
+    if(a(2,i) != 0.0 && b(2,i) != 0.0) {
+      e(i) = a.col(i).transpose() * (*this) * b.col(i);
+      e_sum += e(i);
+      e2_sum += e(i)*e(i);
+      ++n;
+    }
+  }
+  e_sum /= n;
+  e2_sum /= n;
+  sigma = sqrt(e2_sum - e_sum*e_sum);
+
+  std::cout << "SD of Fundamental matrix residual = " << sigma << std::endl;
+  
+  for(i = 0; i<e.size(); ++i) {
+    if(fabs(e(i) - e_sum) > max_err*sigma) {
+      std::cout << "Found outlier at " << i 
+		<< " error = " << fabs(e(i)) << std::endl;
+      //      a.col(i).setZero();
+    }
+  }
+
+}
+
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

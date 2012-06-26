@@ -34,7 +34,7 @@ bool MeasurementMatrix<M>::load(const char *filename) {
   GPixel		currentProjPixel;
   int			points;
   int			currentCol;
-  const double		p = 0.01; // probability of loading point
+  const double		p = 0.002; // probability of loading point
   const int		cameras = 5;
 
   if(!myFile) return(false);
