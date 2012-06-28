@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>ProCamSolver: Main Page</title>
+<title>ProCamSolver: ProCamSolver</title>
 <link href="doxygen.css" rel="stylesheet" type="text/css">
 <link href="tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -15,10 +15,26 @@
   </div>
 </div>
 <div class="contents">
-<h1>ProCamSolver Documentation</h1>
+<h1>ProCamSolver</h1>
 <p>
-<h3 align="center">1.0 </h3></div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Mon Jun 25 17:45:15 2012 for ProCamSolver by&nbsp;
+<h3 align="center">1.0 </h3><dl class="author" compact><dt><b>Author:</b></dt><dd>Dan Tang</dd></dl>
+This is a C++ library for reconstructing a 3D scene from a number of 2D images of the scene. Using the library, the 3D coordinates of points in the scene can be calculated as well as the position/orientation/intrinsics of each camera. It is assumed that a set of pixel correspondences has already been calculated (that is, we have pairs of pixels - one from each of two different images - that correspond to the same 3D point). This is useful for many applications, for example structure from motion, augmented reality and projection mapping.<p>
+The library consists of three main classes: <a class="el" href="classShapeMatrix.html">ShapeMatrix</a>, <a class="el" href="classMotionMatrix.html">MotionMatrix</a> and <a class="el" href="classMeasurementMatrix.html">MeasurementMatrix</a>.<p>
+A <a class="el" href="classMeasurementMatrix.html">MeasurementMatrix</a> can be thought of a container of pixel correspondences (i.e. pixels in different images that correspond to the same 3D point). Each column of this matrix corresponds to a single 3D point for which we have image points, and each block of 3 rows corresponds to a single viewpoint. So, suppose there are N 3D points seen from M views. If the <img class="formulaInl" alt="$j^{th}$" src="form_0.png"> 3D point is seen from the <img class="formulaInl" alt="$i^{th}$" src="form_1.png"> image as pixel <img class="formulaInl" alt="$(x_{ij},y{ij},1)^T$" src="form_2.png">, then the <a class="el" href="classMeasurementMatrix.html">MeasurementMatrix</a> would look like: <p class="formulaDsp">
+<img class="formulaDsp" alt="\[ E = \left( \begin{array}{cccc} x_{00} &amp; x_{01} &amp; \cdots &amp; x_{0N}\\ y_{00} &amp; y_{01} &amp; \cdots &amp; y_{0N}\\ 1 &amp; 1 &amp; \cdots &amp; 1 \\ \vdots &amp; \ddots &amp; &amp; \vdots \\ \vdots &amp; &amp; \ddots &amp; \vdots \\ x_{M0} &amp; x_{M1} &amp; \cdots &amp; x_{MN}\\ y_{M0} &amp; y_{M1} &amp; \cdots &amp; y_{MN}\\ 1 &amp; 1 &amp; \cdots &amp; 1 \\ \end{array} \right) \]" src="form_3.png">
+<p>
+<p>
+A <a class="el" href="classMotionMatrix.html">MotionMatrix</a> is just the camera matrices from each view placed one on top of the other: <p class="formulaDsp">
+<img class="formulaDsp" alt="\[ P = \left( \begin{array}{c} P_0 \\ P_1 \\ \vdots \\ P_M \end{array} \right) \]" src="form_14.png">
+<p>
+<p>
+A <a class="el" href="classShapeMatrix.html">ShapeMatrix</a> contains the reconstructed 3D coordinates of the scene, one coordinate per column, so if the <img class="formulaInl" alt="$n^{th}$" src="form_5.png"> 3D point is <img class="formulaInl" alt="$(x_n, y_n, z_n, 1)^T$" src="form_6.png"> then the corresponding shape matrix is: <p class="formulaDsp">
+<img class="formulaDsp" alt="\[ S = \left( \begin{array}{ccc} x_0 &amp; \cdots &amp; x_N\\ y_0 &amp; \cdots &amp; y_N\\ z_0 &amp; \cdots &amp; z_N\\ 1 &amp; \cdots &amp; 1 \\ \end{array} \right) \]" src="form_13.png">
+<p>
+<p>
+To construct a measurement matrix, use the load, add_correspondence or pixel methods of <a class="el" href="classMeasurementMatrix.html">MeasurementMatrix</a>. Once constructed, the motion matrix can be calculated by constructing an empty <a class="el" href="classMotionMatrix.html">MotionMatrix</a> and using the svd_solve method. If extra accuracy is required, follow this with a call to the bundle_adjust method to find the least squares minimum reprojection error.<p>
+Given a measurement matrix and a motion matrix, the shape matrix can easily be calculated by constructing an empty <a class="el" href="classShapeMatrix.html">ShapeMatrix</a> and calling the solve method. </div>
+<hr size="1"><address style="text-align: right;"><small>Generated on Thu Jun 28 14:32:08 2012 for ProCamSolver by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.6 </small></address>
 </body>

@@ -41,92 +41,139 @@
 <a name="l00030"></a>00030   <span class="keyword">template</span>&lt;<span class="keyword">class</span> DERIVED1, <span class="keyword">class</span> DERIVED2&gt;
 <a name="l00031"></a>00031   <span class="keywordtype">void</span>  <a class="code" href="classFundamentalMatrix.html#c30c8d27c952ca0c29cd96fe813a0154">eight_point_algorithm</a>(<span class="keyword">const</span> Eigen::MatrixBase&lt;DERIVED1&gt; &amp;,
 <a name="l00032"></a>00032                               <span class="keyword">const</span> Eigen::MatrixBase&lt;DERIVED2&gt; &amp;);
-<a name="l00033"></a>00033   <span class="keywordtype">void</span>  <a class="code" href="classFundamentalMatrix.html#e5881b7616fce5175413f99de9d09c6a">calc_epipoles_and_constrain</a>();
-<a name="l00034"></a>00034   <span class="keyword">const</span> Eigen::Vector3d &amp; e_ij()                        {<span class="keywordflow">return</span>(eij);}
-<a name="l00035"></a>00035   <span class="keyword">const</span> Eigen::Vector3d &amp; e_ji()                        {<span class="keywordflow">return</span>(eji);}
-<a name="l00036"></a>00036 
-<a name="l00037"></a>00037   <span class="keyword">template</span>&lt;<span class="keyword">class</span> D&gt;
-<a name="l00038"></a>00038   <a class="code" href="classFundamentalMatrix.html">FundamentalMatrix</a> &amp;operator =(<span class="keyword">const</span> Eigen::MatrixBase&lt;D&gt; &amp;o);
-<a name="l00039"></a>00039 
-<a name="l00040"></a>00040 <span class="keyword">protected</span>:
-<a name="l00041"></a>00041   Eigen::Vector3d       eij;
-<a name="l00042"></a>00042   Eigen::Vector3d       eji;
-<a name="l00043"></a>00043 };
-<a name="l00044"></a>00044 
+<a name="l00033"></a>00033 
+<a name="l00034"></a>00034   <span class="keywordtype">void</span>  <a class="code" href="classFundamentalMatrix.html#e5881b7616fce5175413f99de9d09c6a">calc_epipoles_and_constrain</a>();
+<a name="l00035"></a>00035 
+<a name="l00036"></a>00036   <span class="keyword">template</span>&lt;<span class="keyword">class</span> D1, <span class="keyword">class</span> D2&gt;
+<a name="l00037"></a>00037   <span class="keywordtype">void</span>  remove_outliers(<span class="keyword">const</span> Eigen::MatrixBase&lt;D1&gt; &amp;,
+<a name="l00038"></a>00038                         <span class="keyword">const</span> Eigen::MatrixBase&lt;D2&gt; &amp;, <span class="keyword">const</span> <span class="keywordtype">double</span> &amp;);
+<a name="l00039"></a>00039   
+<a name="l00040"></a>00040   <span class="keyword">const</span> Eigen::Vector3d &amp; e_ij()                        {<span class="keywordflow">return</span>(eij);}
+<a name="l00041"></a>00041   <span class="keyword">const</span> Eigen::Vector3d &amp; e_ji()                        {<span class="keywordflow">return</span>(eji);}
+<a name="l00042"></a>00042 
+<a name="l00043"></a>00043   <span class="keyword">template</span>&lt;<span class="keyword">class</span> D&gt;
+<a name="l00044"></a>00044   <a class="code" href="classFundamentalMatrix.html">FundamentalMatrix</a> &amp;operator =(<span class="keyword">const</span> Eigen::MatrixBase&lt;D&gt; &amp;o);
 <a name="l00045"></a>00045 
-<a name="l00048"></a>00048 <span class="keyword">inline</span> FundamentalMatrix::FundamentalMatrix()
-<a name="l00049"></a>00049 {
-<a name="l00050"></a>00050 }
+<a name="l00046"></a>00046 <span class="keyword">protected</span>:
+<a name="l00047"></a>00047   Eigen::Vector3d       eij;
+<a name="l00048"></a>00048   Eigen::Vector3d       eji;
+<a name="l00049"></a>00049 };
+<a name="l00050"></a>00050 
 <a name="l00051"></a>00051 
-<a name="l00072"></a>00072 <span class="keyword">template</span>&lt;<span class="keyword">class</span> DERIVED1, <span class="keyword">class</span> DERIVED2&gt;
-<a name="l00073"></a>00073 <span class="keywordtype">void</span> <a class="code" href="classFundamentalMatrix.html#c30c8d27c952ca0c29cd96fe813a0154">FundamentalMatrix::</a>
-<a name="l00074"></a><a class="code" href="classFundamentalMatrix.html#c30c8d27c952ca0c29cd96fe813a0154">00074</a> <a class="code" href="classFundamentalMatrix.html#c30c8d27c952ca0c29cd96fe813a0154">eight_point_algorithm</a>(<span class="keyword">const</span> Eigen::MatrixBase&lt;DERIVED1&gt; &amp;a,
-<a name="l00075"></a>00075                       <span class="keyword">const</span> Eigen::MatrixBase&lt;DERIVED2&gt; &amp;b){
-<a name="l00076"></a>00076   <span class="comment">// --- A is the lifted matrix of correspondences</span>
-<a name="l00077"></a>00077   Eigen::Matrix&lt;double,Eigen::Dynamic,9&gt;                        A;
-<a name="l00078"></a>00078   Eigen::Matrix&lt;double,9,9&gt;                                     ATA;
-<a name="l00079"></a>00079   Eigen::JacobiSVD&lt;Eigen::Matrix&lt;double,Eigen::Dynamic,9&gt; &gt;     Adecomposition;
-<a name="l00080"></a>00080   <span class="keywordtype">int</span>   point;
-<a name="l00081"></a>00081   <span class="keywordtype">int</span>   validCorrespondences;
-<a name="l00082"></a>00082   <span class="keywordtype">int</span>   totalCorrespondences;   
-<a name="l00083"></a>00083   <span class="keywordtype">int</span>   n;
-<a name="l00084"></a>00084 
-<a name="l00085"></a>00085   <span class="comment">// --- Sanity checks</span>
-<a name="l00086"></a>00086   <span class="keywordflow">if</span>(a.rows() != 3 || b.rows() != 3) 
-<a name="l00087"></a>00087     <span class="keywordflow">throw</span>(<span class="stringliteral">"Inputs to eight_point_algorithm must have 3 rows"</span>);
-<a name="l00088"></a>00088 
-<a name="l00089"></a>00089   <span class="comment">// --- form normalised correspondence matrix</span>
-<a name="l00090"></a>00090   <span class="comment">// -----------------------------------------</span>
-<a name="l00091"></a>00091   validCorrespondences = 0;
-<a name="l00092"></a>00092   totalCorrespondences = (a.cols()&lt;b.cols()?a.cols():b.cols());
-<a name="l00093"></a>00093   <span class="keywordflow">for</span>(point = 0; point&lt;totalCorrespondences; ++point) {
-<a name="l00094"></a>00094     <span class="keywordflow">if</span>(a(2,point) != 0.0 &amp;&amp; b(2,point) != 0.0) {
-<a name="l00095"></a>00095       ++validCorrespondences;
-<a name="l00096"></a>00096     }
-<a name="l00097"></a>00097   }
-<a name="l00098"></a>00098   A.resize(validCorrespondences,9);
-<a name="l00099"></a>00099   n = 0;
-<a name="l00100"></a>00100   <span class="keywordflow">for</span>(point = 0; point&lt;totalCorrespondences; ++point) {
-<a name="l00101"></a>00101     <span class="keywordflow">if</span>(a(2,point) != 0.0 &amp;&amp; b(2,point) != 0.0) {
-<a name="l00102"></a>00102       A(n,0) = b(0,point)*a(0,point);
-<a name="l00103"></a>00103       A(n,1) = b(0,point)*a(1,point);
-<a name="l00104"></a>00104       A(n,2) = b(0,point);
-<a name="l00105"></a>00105       A(n,3) = b(1,point)*a(0,point);
-<a name="l00106"></a>00106       A(n,4) = b(1,point)*a(1,point);
-<a name="l00107"></a>00107       A(n,5) = b(1,point);
-<a name="l00108"></a>00108       A(n,6) = a(0,point);
-<a name="l00109"></a>00109       A(n,7) = a(1,point);
-<a name="l00110"></a>00110       A(n,8) = 1.0;
-<a name="l00111"></a>00111       ++n;
-<a name="l00112"></a>00112     }
-<a name="l00113"></a>00113   }
-<a name="l00114"></a>00114 
-<a name="l00115"></a>00115   <span class="comment">// --- Approximately solve AF = 0 by SVD</span>
-<a name="l00116"></a>00116   <span class="comment">// -------------------------------------</span>
-<a name="l00117"></a>00117   ATA = A.transpose()*A;
-<a name="l00118"></a>00118   Adecomposition.compute(ATA, Eigen::ComputeFullV);
-<a name="l00119"></a>00119   col(0) = Adecomposition.matrixV().block(0,8,3,1);
-<a name="l00120"></a>00120   col(1) = Adecomposition.matrixV().block(3,8,3,1);
-<a name="l00121"></a>00121   col(2) = Adecomposition.matrixV().block(6,8,3,1);
-<a name="l00122"></a>00122 
-<a name="l00123"></a>00123   <span class="comment">// --- Enforce zero determinant of F</span>
-<a name="l00124"></a>00124   <span class="comment">// ---------------------------------</span>
-<a name="l00125"></a>00125   <a class="code" href="classFundamentalMatrix.html#e5881b7616fce5175413f99de9d09c6a">calc_epipoles_and_constrain</a>();
-<a name="l00126"></a>00126 
-<a name="l00127"></a>00127   <span class="comment">// std::cout &lt;&lt; "Residual in eight_point_algorithm = " &lt;&lt; std::endl;</span>
-<a name="l00128"></a>00128   <span class="comment">// std::cout &lt;&lt; (a.transpose() * (*this) * b).diagonal() &lt;&lt; std::endl;</span>
-<a name="l00129"></a>00129 }
-<a name="l00130"></a>00130 
-<a name="l00133"></a>00133 <span class="keyword">template</span>&lt;<span class="keyword">class</span> D&gt;
-<a name="l00134"></a>00134 <a class="code" href="classFundamentalMatrix.html">FundamentalMatrix</a> &amp;FundamentalMatrix::operator =(<span class="keyword">const</span> Eigen::MatrixBase&lt;D&gt; &amp;o) {
-<a name="l00135"></a>00135   Eigen::Matrix3d::operator =(o);
-<a name="l00136"></a>00136   <span class="keywordflow">return</span>(*<span class="keyword">this</span>);
-<a name="l00137"></a>00137 }
-<a name="l00138"></a>00138 
-<a name="l00139"></a>00139 
-<a name="l00140"></a>00140 <span class="preprocessor">#endif</span>
+<a name="l00054"></a>00054 <span class="keyword">inline</span> FundamentalMatrix::FundamentalMatrix()
+<a name="l00055"></a>00055 {
+<a name="l00056"></a>00056 }
+<a name="l00057"></a>00057 
+<a name="l00078"></a>00078 <span class="keyword">template</span>&lt;<span class="keyword">class</span> DERIVED1, <span class="keyword">class</span> DERIVED2&gt;
+<a name="l00079"></a>00079 <span class="keywordtype">void</span> <a class="code" href="classFundamentalMatrix.html#c30c8d27c952ca0c29cd96fe813a0154">FundamentalMatrix::</a>
+<a name="l00080"></a><a class="code" href="classFundamentalMatrix.html#c30c8d27c952ca0c29cd96fe813a0154">00080</a> <a class="code" href="classFundamentalMatrix.html#c30c8d27c952ca0c29cd96fe813a0154">eight_point_algorithm</a>(<span class="keyword">const</span> Eigen::MatrixBase&lt;DERIVED1&gt; &amp;a,
+<a name="l00081"></a>00081                       <span class="keyword">const</span> Eigen::MatrixBase&lt;DERIVED2&gt; &amp;b){
+<a name="l00082"></a>00082   <span class="comment">// --- A is the lifted matrix of correspondences</span>
+<a name="l00083"></a>00083   Eigen::Matrix&lt;double,Eigen::Dynamic,9&gt;                        A;
+<a name="l00084"></a>00084   Eigen::Matrix&lt;double,9,9&gt;                                     ATA;
+<a name="l00085"></a>00085   Eigen::JacobiSVD&lt;Eigen::Matrix&lt;double,Eigen::Dynamic,9&gt; &gt;     Adecomposition;
+<a name="l00086"></a>00086   <span class="keywordtype">int</span>   point;
+<a name="l00087"></a>00087   <span class="keywordtype">int</span>   validCorrespondences;
+<a name="l00088"></a>00088   <span class="keywordtype">int</span>   totalCorrespondences;   
+<a name="l00089"></a>00089   <span class="keywordtype">int</span>   n;
+<a name="l00090"></a>00090 
+<a name="l00091"></a>00091   <span class="comment">// --- Sanity checks</span>
+<a name="l00092"></a>00092   <span class="keywordflow">if</span>(a.rows() != 3 || b.rows() != 3) 
+<a name="l00093"></a>00093     <span class="keywordflow">throw</span>(<span class="stringliteral">"Inputs to eight_point_algorithm must have 3 rows"</span>);
+<a name="l00094"></a>00094 
+<a name="l00095"></a>00095   <span class="comment">// --- form normalised correspondence matrix</span>
+<a name="l00096"></a>00096   <span class="comment">// -----------------------------------------</span>
+<a name="l00097"></a>00097   validCorrespondences = 0;
+<a name="l00098"></a>00098   totalCorrespondences = (a.cols()&lt;b.cols()?a.cols():b.cols());
+<a name="l00099"></a>00099   <span class="keywordflow">for</span>(point = 0; point&lt;totalCorrespondences; ++point) {
+<a name="l00100"></a>00100     <span class="keywordflow">if</span>(a(2,point) != 0.0 &amp;&amp; b(2,point) != 0.0) {
+<a name="l00101"></a>00101       ++validCorrespondences;
+<a name="l00102"></a>00102     }
+<a name="l00103"></a>00103   }
+<a name="l00104"></a>00104   A.resize(validCorrespondences,9);
+<a name="l00105"></a>00105   n = 0;
+<a name="l00106"></a>00106   <span class="keywordflow">for</span>(point = 0; point&lt;totalCorrespondences; ++point) {
+<a name="l00107"></a>00107     <span class="keywordflow">if</span>(a(2,point) != 0.0 &amp;&amp; b(2,point) != 0.0) {
+<a name="l00108"></a>00108       A(n,0) = b(0,point)*a(0,point);
+<a name="l00109"></a>00109       A(n,1) = b(0,point)*a(1,point);
+<a name="l00110"></a>00110       A(n,2) = b(0,point);
+<a name="l00111"></a>00111       A(n,3) = b(1,point)*a(0,point);
+<a name="l00112"></a>00112       A(n,4) = b(1,point)*a(1,point);
+<a name="l00113"></a>00113       A(n,5) = b(1,point);
+<a name="l00114"></a>00114       A(n,6) = a(0,point);
+<a name="l00115"></a>00115       A(n,7) = a(1,point);
+<a name="l00116"></a>00116       A(n,8) = 1.0;
+<a name="l00117"></a>00117       ++n;
+<a name="l00118"></a>00118     }
+<a name="l00119"></a>00119   }
+<a name="l00120"></a>00120 
+<a name="l00121"></a>00121   <span class="comment">// --- Approximately solve AF = 0 by SVD</span>
+<a name="l00122"></a>00122   <span class="comment">// -------------------------------------</span>
+<a name="l00123"></a>00123   ATA = A.transpose()*A;
+<a name="l00124"></a>00124   Adecomposition.compute(ATA, Eigen::ComputeFullV);
+<a name="l00125"></a>00125   col(0) = Adecomposition.matrixV().block(0,8,3,1);
+<a name="l00126"></a>00126   col(1) = Adecomposition.matrixV().block(3,8,3,1);
+<a name="l00127"></a>00127   col(2) = Adecomposition.matrixV().block(6,8,3,1);
+<a name="l00128"></a>00128 
+<a name="l00129"></a>00129   <span class="comment">// --- Enforce zero determinant of F</span>
+<a name="l00130"></a>00130   <span class="comment">// ---------------------------------</span>
+<a name="l00131"></a>00131   <a class="code" href="classFundamentalMatrix.html#e5881b7616fce5175413f99de9d09c6a">calc_epipoles_and_constrain</a>();
+<a name="l00132"></a>00132 
+<a name="l00133"></a>00133   <span class="comment">//std::cout &lt;&lt; "Residual in eight_point_algorithm = " &lt;&lt; std::endl;</span>
+<a name="l00134"></a>00134   <span class="comment">//std::cout &lt;&lt; (a.transpose() * (*this) * b).diagonal().transpose() &lt;&lt; std::endl;</span>
+<a name="l00135"></a>00135 }
+<a name="l00136"></a>00136 
+<a name="l00137"></a>00137 
+<a name="l00140"></a>00140 <span class="keyword">template</span>&lt;<span class="keyword">class</span> D1, <span class="keyword">class</span> D2&gt;
+<a name="l00141"></a>00141 <span class="keywordtype">void</span> FundamentalMatrix::
+<a name="l00142"></a>00142 remove_outliers(<span class="keyword">const</span> Eigen::MatrixBase&lt;D1&gt; &amp;a,
+<a name="l00143"></a>00143                 <span class="keyword">const</span> Eigen::MatrixBase&lt;D2&gt; &amp;b,
+<a name="l00144"></a>00144                 <span class="keyword">const</span> <span class="keywordtype">double</span> &amp;max_err) {
+<a name="l00145"></a>00145   Eigen::VectorXd       e;              <span class="comment">// a^T F b = e</span>
+<a name="l00146"></a>00146   <span class="keywordtype">double</span>                e_sum;
+<a name="l00147"></a>00147   <span class="keywordtype">double</span>                e2_sum;
+<a name="l00148"></a>00148   <span class="keywordtype">double</span>                sigma;
+<a name="l00149"></a>00149   <span class="keywordtype">int</span>                   i;
+<a name="l00150"></a>00150   <span class="keywordtype">int</span>                   n;
+<a name="l00151"></a>00151 
+<a name="l00152"></a>00152   e.resize(a.cols());
+<a name="l00153"></a>00153   e.setZero();
+<a name="l00154"></a>00154   n = 0;
+<a name="l00155"></a>00155   <span class="keywordflow">for</span>(i = 0; i&lt;a.cols(); ++i) {
+<a name="l00156"></a>00156     <span class="keywordflow">if</span>(a(2,i) != 0.0 &amp;&amp; b(2,i) != 0.0) {
+<a name="l00157"></a>00157       e(i) = a.col(i).transpose() * (*this) * b.col(i);
+<a name="l00158"></a>00158       e_sum += e(i);
+<a name="l00159"></a>00159       e2_sum += e(i)*e(i);
+<a name="l00160"></a>00160       ++n;
+<a name="l00161"></a>00161     }
+<a name="l00162"></a>00162   }
+<a name="l00163"></a>00163   e_sum /= n;
+<a name="l00164"></a>00164   e2_sum /= n;
+<a name="l00165"></a>00165   sigma = sqrt(e2_sum - e_sum*e_sum);
+<a name="l00166"></a>00166 
+<a name="l00167"></a>00167   std::cout &lt;&lt; <span class="stringliteral">"SD of Fundamental matrix residual = "</span> &lt;&lt; sigma &lt;&lt; std::endl;
+<a name="l00168"></a>00168   
+<a name="l00169"></a>00169   <span class="keywordflow">for</span>(i = 0; i&lt;e.size(); ++i) {
+<a name="l00170"></a>00170     <span class="keywordflow">if</span>(fabs(e(i) - e_sum) &gt; max_err*sigma) {
+<a name="l00171"></a>00171       std::cout &lt;&lt; <span class="stringliteral">"Found outlier at "</span> &lt;&lt; i 
+<a name="l00172"></a>00172                 &lt;&lt; <span class="stringliteral">" error = "</span> &lt;&lt; fabs(e(i)) &lt;&lt; std::endl;
+<a name="l00173"></a>00173       <span class="comment">//      a.col(i).setZero();</span>
+<a name="l00174"></a>00174     }
+<a name="l00175"></a>00175   }
+<a name="l00176"></a>00176 
+<a name="l00177"></a>00177 }
+<a name="l00178"></a>00178 
+<a name="l00179"></a>00179 
+<a name="l00182"></a>00182 <span class="keyword">template</span>&lt;<span class="keyword">class</span> D&gt;
+<a name="l00183"></a>00183 <a class="code" href="classFundamentalMatrix.html">FundamentalMatrix</a> &amp;FundamentalMatrix::operator =(<span class="keyword">const</span> Eigen::MatrixBase&lt;D&gt; &amp;o) {
+<a name="l00184"></a>00184   Eigen::Matrix3d::operator =(o);
+<a name="l00185"></a>00185   <span class="keywordflow">return</span>(*<span class="keyword">this</span>);
+<a name="l00186"></a>00186 }
+<a name="l00187"></a>00187 
+<a name="l00188"></a>00188 
+<a name="l00189"></a>00189 <span class="preprocessor">#endif</span>
 </pre></div></div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Mon Jun 25 17:45:15 2012 for ProCamSolver by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Thu Jun 28 14:32:08 2012 for ProCamSolver by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.6 </small></address>
 </body>

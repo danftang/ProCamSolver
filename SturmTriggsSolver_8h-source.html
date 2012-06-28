@@ -50,23 +50,31 @@
 <a name="l00047"></a>00047   <span class="keywordtype">void</span>  <a class="code" href="classSturmTriggsSolver.html#f9c8874c96e7189a154cef6bae5c60bc">create_connectivity_graph</a>(Eigen::Matrix&lt;double,M,M&gt; &amp;);
 <a name="l00048"></a>00048   <span class="keywordtype">void</span>  form_subspace(std::vector&lt;int&gt;::iterator, <a class="code" href="classMeasurementMatrix.html">MeasurementMatrix&lt;M&gt;</a> &amp;);
 <a name="l00049"></a>00049 
-<a name="l00050"></a>00050   <span class="keywordtype">bool</span> <a class="code" href="classSturmTriggsSolver.html#fe7f012f2e541a5ceac333fe43306379">operator ()</a>(<span class="keywordtype">int</span>, <span class="keywordtype">int</span>);
-<a name="l00051"></a>00051 
-<a name="l00052"></a>00052 <span class="keyword">protected</span>:
-<a name="l00053"></a>00053   <span class="keywordtype">void</span>  <a class="code" href="classSturmTriggsSolver.html#1d01bcc1c1ef42701620a90e4b3a3290">random_permute</a>(std::vector&lt;int&gt; &amp;);
-<a name="l00054"></a>00054 
-<a name="l00055"></a>00055 <span class="keyword">protected</span>:
-<a name="l00056"></a>00056   <a class="code" href="classMeasurementMatrix.html">MeasurementMatrix&lt;M&gt;</a>          measurement;
-<a name="l00057"></a>00057   <a class="code" href="classMotionMatrix.html">MotionMatrix&lt;M&gt;</a> &amp;             motion;
-<a name="l00058"></a>00058   <a class="code" href="classShapeMatrix.html">ShapeMatrix</a> &amp;                 shape;
-<a name="l00059"></a>00059   Eigen::Matrix&lt;int,M,1&gt;        spanning_tree;      <span class="comment">// tree of views</span>
-<a name="l00060"></a>00060 };
+<a name="l00050"></a>00050   <span class="keyword">class </span>colCompare {
+<a name="l00051"></a>00051   <span class="keyword">public</span>:
+<a name="l00052"></a>00052     colCompare(<a class="code" href="classMeasurementMatrix.html">MeasurementMatrix&lt;M&gt;</a> &amp;m) : measurement(m) {};
+<a name="l00053"></a>00053     <span class="keywordtype">bool</span> operator ()(<span class="keywordtype">int</span>, <span class="keywordtype">int</span>);
+<a name="l00054"></a>00054   <span class="keyword">protected</span>:
+<a name="l00055"></a>00055     <a class="code" href="classMeasurementMatrix.html">MeasurementMatrix&lt;M&gt;</a> &amp;measurement;
+<a name="l00056"></a>00056   };
+<a name="l00057"></a>00057 
+<a name="l00058"></a>00058 <span class="keyword">protected</span>:
+<a name="l00059"></a>00059   <span class="keywordtype">void</span>  <a class="code" href="classSturmTriggsSolver.html#1d01bcc1c1ef42701620a90e4b3a3290">random_permute</a>(std::vector&lt;int&gt; &amp;);
+<a name="l00060"></a>00060   <span class="keywordtype">void</span>  <a class="code" href="classSturmTriggsSolver.html#1e4d064b50910113954e779a2bb1ea5f">set_measurement_matrix</a>(<span class="keyword">const</span> <a class="code" href="classMeasurementMatrix.html">MeasurementMatrix&lt;M&gt;</a> &amp;);
 <a name="l00061"></a>00061 
-<a name="l00062"></a>00062 <span class="preprocessor">#include "SturmTriggsSolver.hpp"</span>
-<a name="l00063"></a>00063 
-<a name="l00064"></a>00064 <span class="preprocessor">#endif</span>
+<a name="l00062"></a>00062 <span class="keyword">protected</span>:
+<a name="l00063"></a>00063   <a class="code" href="classMeasurementMatrix.html">MeasurementMatrix&lt;M&gt;</a>          measurement;
+<a name="l00064"></a>00064   <a class="code" href="classMotionMatrix.html">MotionMatrix&lt;M&gt;</a> &amp;             motion;
+<a name="l00065"></a>00065   <a class="code" href="classShapeMatrix.html">ShapeMatrix</a> &amp;                 shape;
+<a name="l00066"></a>00066   Eigen::Matrix&lt;int,M,1&gt;        spanning_tree;      <span class="comment">// tree of views</span>
+<a name="l00067"></a>00067   Eigen::Matrix&lt;int,M,1&gt;        tree_traversal;      <span class="comment">// tree of views</span>
+<a name="l00068"></a>00068 };
+<a name="l00069"></a>00069 
+<a name="l00070"></a>00070 <span class="preprocessor">#include "SturmTriggsSolver.hpp"</span>
+<a name="l00071"></a>00071 
+<a name="l00072"></a>00072 <span class="preprocessor">#endif</span>
 </pre></div></div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Mon Jun 25 17:45:15 2012 for ProCamSolver by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Thu Jun 28 14:32:08 2012 for ProCamSolver by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.6 </small></address>
 </body>

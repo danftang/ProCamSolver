@@ -43,10 +43,10 @@
 <tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="63d074dc50887440a4bff598a811ec74"></a><!-- doxytag: member="SturmTriggsSolver::form_subspace" ref="63d074dc50887440a4bff598a811ec74" args="(std::vector&lt; int &gt;::iterator, MeasurementMatrix&lt; M &gt; &amp;)" -->
 void&nbsp;</td><td class="memItemRight" valign="bottom"><b>form_subspace</b> (std::vector&lt; int &gt;::iterator, <a class="el" href="classMeasurementMatrix.html">MeasurementMatrix</a>&lt; M &gt; &amp;)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSturmTriggsSolver.html#fe7f012f2e541a5ceac333fe43306379">operator()</a> (int, int)</td></tr>
-
 <tr><td colspan="2"><br><h2>Protected Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSturmTriggsSolver.html#1d01bcc1c1ef42701620a90e4b3a3290">random_permute</a> (std::vector&lt; int &gt; &amp;)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSturmTriggsSolver.html#1e4d064b50910113954e779a2bb1ea5f">set_measurement_matrix</a> (const <a class="el" href="classMeasurementMatrix.html">MeasurementMatrix</a>&lt; M &gt; &amp;)</td></tr>
 
 <tr><td colspan="2"><br><h2>Protected Attributes</h2></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="3251779956661d31943a5653b74676b5"></a><!-- doxytag: member="SturmTriggsSolver::measurement" ref="3251779956661d31943a5653b74676b5" args="" -->
@@ -60,6 +60,12 @@ void&nbsp;</td><td class="memItemRight" valign="bottom"><b>form_subspace</b> (st
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="056f697da786c36de9a90257a837b7f9"></a><!-- doxytag: member="SturmTriggsSolver::spanning_tree" ref="056f697da786c36de9a90257a837b7f9" args="" -->
 Eigen::Matrix&lt; int, M, 1 &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><b>spanning_tree</b></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="anchor" name="249092bb4d050c00b9b453e34732842b"></a><!-- doxytag: member="SturmTriggsSolver::tree_traversal" ref="249092bb4d050c00b9b453e34732842b" args="" -->
+Eigen::Matrix&lt; int, M, 1 &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><b>tree_traversal</b></td></tr>
+
+<tr><td colspan="2"><br><h2>Classes</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">class &nbsp;</td><td class="memItemRight" valign="bottom"><b>colCompare</b></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
@@ -164,44 +170,6 @@ template&lt;int M&gt; </div>
 Sets G to the graph whose vertices represent views and whose edge weights are a measure of the expected error in the fundamental matrix between views. G is in the form of an adjacency matrix. 
 </div>
 </div><p>
-<a class="anchor" name="fe7f012f2e541a5ceac333fe43306379"></a><!-- doxytag: member="SturmTriggsSolver::operator()" ref="fe7f012f2e541a5ceac333fe43306379" args="(int, int)" -->
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;int M&gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">bool <a class="el" href="classSturmTriggsSolver.html">SturmTriggsSolver</a>&lt; M &gt;::operator()           </td>
-          <td>(</td>
-          <td class="paramtype">int&nbsp;</td>
-          <td class="paramname"> <em>j1</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&nbsp;</td>
-          <td class="paramname"> <em>j2</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td><code> [inline]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Used by std::sort algorithm during occluded factorisation. Returns true if column j1 of the measurement matrix is 'less than' column j2 in a strict weak ordering.<p>
-The ordering is as follows:<p>
-1) Order by positions of occluded pixels using Gray code ordering<p>
-Gray code ordering is used so that adjacent columns have the most overlapping occlusions, and then the most overlapping unweighted pixels.<p>
-If (g_n...g_0) are the bits of a Gray code, then the binary expansion of its position in order (b_n...b_0) can be calculated using the recurrence relation:<p>
-b_{m-1} = b_m XOR g_m<p>
-with<p>
-b_n = g_n 
-</div>
-</div><p>
 <a class="anchor" name="1d01bcc1c1ef42701620a90e4b3a3290"></a><!-- doxytag: member="SturmTriggsSolver::random_permute" ref="1d01bcc1c1ef42701620a90e4b3a3290" args="(std::vector&lt; int &gt; &amp;)" -->
 <div class="memitem">
 <div class="memproto">
@@ -224,10 +192,32 @@ template&lt;int M&gt; </div>
 Randomly permutes the elements of p 
 </div>
 </div><p>
+<a class="anchor" name="1e4d064b50910113954e779a2bb1ea5f"></a><!-- doxytag: member="SturmTriggsSolver::set_measurement_matrix" ref="1e4d064b50910113954e779a2bb1ea5f" args="(const MeasurementMatrix&lt; M &gt; &amp;)" -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int M&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classSturmTriggsSolver.html">SturmTriggsSolver</a>&lt; M &gt;::set_measurement_matrix           </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classMeasurementMatrix.html">MeasurementMatrix</a>&lt; M &gt; &amp;&nbsp;</td>
+          <td class="paramname"> <em>E</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline, protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Takes a copy of the measurement matrix and builds a spanning tree of views 
+</div>
+</div><p>
 <hr>The documentation for this class was generated from the following files:<ul>
 <li><a class="el" href="SturmTriggsSolver_8h-source.html">SturmTriggsSolver.h</a><li><a class="el" href="SturmTriggsSolver_8hpp-source.html">SturmTriggsSolver.hpp</a></ul>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Mon Jun 25 17:45:15 2012 for ProCamSolver by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Thu Jun 28 14:32:08 2012 for ProCamSolver by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.6 </small></address>
 </body>

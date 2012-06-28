@@ -1,0 +1,15 @@
+\form#0:$j^{th}$
+\form#1:$i^{th}$
+\form#2:$(x_{ij},y{ij},1)^T$
+\form#3:\[ E = \left( \begin{array}{cccc} x_{00} & x_{01} & \cdots & x_{0N}\\ y_{00} & y_{01} & \cdots & y_{0N}\\ 1 & 1 & \cdots & 1 \\ \vdots & \ddots & & \vdots \\ \vdots & & \ddots & \vdots \\ x_{M0} & x_{M1} & \cdots & x_{MN}\\ y_{M0} & y_{M1} & \cdots & y_{MN}\\ 1 & 1 & \cdots & 1 \\ \end{array} \right) \]
+\form#4:\[ E = \left( \begin{array}{c} */ P_0 \ P_1 \ \vdots \ P_M /**\end{array} \right) \]
+\form#5:$n^{th}$
+\form#6:$(x_n, y_n, z_n, 1)^T$
+\form#7:\[ E = \left( \begin{array}{cccc} */ x_0 & \cdots & x_N\ y_0 & \cdots & y_N\ z_0 & \cdots & z_N\ 1 & \cdots & 1\ /**\end{array} \right) \]
+\form#8:\[ E = \left( \begin{array}{ccc} */ x_0 & \cdots & x_N\ y_0 & \cdots & y_N\ z_0 & \cdots & z_N\ 1 & \cdots & 1\ /**\end{array} \right) \]
+\form#9:\[ E = \left( \begin{array}{ccc} */ x_0 & \cdots & x_N \ y_0 & \cdots & y_N \ z_0 & \cdots & z_N \ 1 & \cdots & 1 \ /**\end{array} \right) \]
+\form#10:\[ E = \left( \begin{array}{ccc} */ x_{0} & \cdots & x_{N} \ y_0 & \cdots & y_N \ z_0 & \cdots & z_N \ 1 & \cdots & 1 \ /**\end{array} \right) \]
+\form#11:\[ P = \left( \begin{array}{c} */ P_0 \ P_1 \ \vdots \ P_M /**\end{array} \right) \]
+\form#12:\[ S = \left( \begin{array}{ccc} */ x_{0} & \cdots & x_{N}\ y_{0} & \cdots & y_{N} \ z_0 & \cdots & z_N \ 1 & \cdots & 1 \ /**\end{array} \right) \]
+\form#13:\[ S = \left( \begin{array}{ccc} x_0 & \cdots & x_N\\ y_0 & \cdots & y_N\\ z_0 & \cdots & z_N\\ 1 & \cdots & 1 \\ \end{array} \right) \]
+\form#14:\[ P = \left( \begin{array}{c} P_0 \\ P_1 \\ \vdots \\ P_M \end{array} \right) \]
