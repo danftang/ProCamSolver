@@ -40,43 +40,43 @@
 <a name="l00030"></a>00030   <span class="keywordtype">double</span> x;     <span class="comment">// (x,y) of pixel in first view</span>
 <a name="l00031"></a>00031   <span class="keywordtype">double</span> y;
 <a name="l00032"></a>00032 
-<a name="l00033"></a>00033   <span class="keywordtype">bool</span> operator ==(<span class="keyword">const</span> <a class="code" href="classGPixel.html">GPixel</a> &amp;) <span class="keyword">const</span>;
+<a name="l00033"></a>00033   <span class="keywordtype">bool</span> <a class="code" href="classGPixel.html#2a188503b061046a80d4cc0f8ffc0c0d">operator ==</a>(<span class="keyword">const</span> <a class="code" href="classGPixel.html">GPixel</a> &amp;) <span class="keyword">const</span>;
 <a name="l00034"></a>00034   <span class="keywordtype">bool</span> operator !=(<span class="keyword">const</span> <a class="code" href="classGPixel.html">GPixel</a> &amp;) <span class="keyword">const</span>;
 <a name="l00035"></a>00035   <span class="keywordtype">bool</span> operator &lt;(<span class="keyword">const</span> <a class="code" href="classGPixel.html">GPixel</a> &amp;) <span class="keyword">const</span>;
 <a name="l00036"></a>00036   
 <a name="l00037"></a>00037 };
 <a name="l00038"></a>00038 
 <a name="l00039"></a>00039 
-<a name="l00042"></a>00042 <span class="keyword">inline</span> <span class="keywordtype">bool</span> GPixel::operator ==(<span class="keyword">const</span> <a class="code" href="classGPixel.html">GPixel</a> &amp;o)<span class="keyword"> const </span>{
-<a name="l00043"></a>00043   <span class="keywordflow">return</span>(<span class="keywordtype">id</span> == o.<a class="code" href="classGPixel.html#5838e0e085f8bc6267d57e83732fa10e">id</a> &amp;&amp; fabs(x-o.<a class="code" href="classGPixel.html#7bd069cdb4aa390e7de6fbdd35fd6181">x</a>) &lt; 1e-5 &amp;&amp; fabs(y - o.<a class="code" href="classGPixel.html#fbcc5faf9aed7beb2427625d244b1cf6">y</a>) &lt; 1e-5);
-<a name="l00044"></a>00044 }
-<a name="l00045"></a>00045 
-<a name="l00046"></a>00046 
-<a name="l00049"></a>00049 <span class="keyword">inline</span> <span class="keywordtype">bool</span> GPixel::operator !=(<span class="keyword">const</span> <a class="code" href="classGPixel.html">GPixel</a> &amp;o)<span class="keyword"> const </span>{
-<a name="l00050"></a>00050  <span class="keywordflow">return</span>(!<span class="keyword">operator</span> ==(o));
-<a name="l00051"></a>00051 }
-<a name="l00052"></a>00052 
-<a name="l00053"></a>00053 
-<a name="l00056"></a>00056 <span class="keyword">inline</span> <span class="keywordtype">bool</span> GPixel::operator &lt;(<span class="keyword">const</span> <a class="code" href="classGPixel.html">GPixel</a> &amp;o)<span class="keyword"> const </span>{
-<a name="l00057"></a>00057   <span class="keywordflow">if</span>(<span class="keywordtype">id</span> &lt; o.<a class="code" href="classGPixel.html#5838e0e085f8bc6267d57e83732fa10e">id</a>) <span class="keywordflow">return</span>(<span class="keyword">true</span>);
-<a name="l00058"></a>00058   <span class="keywordflow">if</span>(<span class="keywordtype">id</span> &gt; o.<a class="code" href="classGPixel.html#5838e0e085f8bc6267d57e83732fa10e">id</a>) <span class="keywordflow">return</span>(<span class="keyword">false</span>);
-<a name="l00059"></a>00059   <span class="keywordflow">if</span>(x &lt; o.<a class="code" href="classGPixel.html#7bd069cdb4aa390e7de6fbdd35fd6181">x</a>) <span class="keywordflow">return</span>(<span class="keyword">true</span>);
-<a name="l00060"></a>00060   <span class="keywordflow">if</span>(x &gt; o.<a class="code" href="classGPixel.html#7bd069cdb4aa390e7de6fbdd35fd6181">x</a>) <span class="keywordflow">return</span>(<span class="keyword">false</span>);
-<a name="l00061"></a>00061   <span class="keywordflow">if</span>(y &lt; o.<a class="code" href="classGPixel.html#fbcc5faf9aed7beb2427625d244b1cf6">y</a>) <span class="keywordflow">return</span>(<span class="keyword">true</span>);
-<a name="l00062"></a>00062   <span class="keywordflow">return</span>(<span class="keyword">false</span>);
-<a name="l00063"></a>00063 }
-<a name="l00064"></a>00064 
-<a name="l00065"></a>00065 
-<a name="l00068"></a>00068 <span class="keyword">inline</span> std::ostream &amp;operator &lt;&lt;(std::ostream &amp;out, <span class="keyword">const</span> <a class="code" href="classGPixel.html">GPixel</a> &amp;c) {
-<a name="l00069"></a>00069   out &lt;&lt; <span class="stringliteral">"("</span> &lt;&lt; c.<a class="code" href="classGPixel.html#5838e0e085f8bc6267d57e83732fa10e">id</a> &lt;&lt; <span class="stringliteral">" "</span> 
-<a name="l00070"></a>00070       &lt;&lt; c.<a class="code" href="classGPixel.html#7bd069cdb4aa390e7de6fbdd35fd6181">x</a> &lt;&lt; <span class="stringliteral">" "</span>
-<a name="l00071"></a>00071       &lt;&lt; c.<a class="code" href="classGPixel.html#fbcc5faf9aed7beb2427625d244b1cf6">y</a> &lt;&lt; <span class="stringliteral">")"</span>;
-<a name="l00072"></a>00072   <span class="keywordflow">return</span>(out);
-<a name="l00073"></a>00073 }
-<a name="l00074"></a>00074 
-<a name="l00075"></a>00075 <span class="preprocessor">#endif</span>
+<a name="l00044"></a><a class="code" href="classGPixel.html#2a188503b061046a80d4cc0f8ffc0c0d">00044</a> <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="classGPixel.html#2a188503b061046a80d4cc0f8ffc0c0d">GPixel::operator ==</a>(<span class="keyword">const</span> <a class="code" href="classGPixel.html">GPixel</a> &amp;o)<span class="keyword"> const </span>{
+<a name="l00045"></a>00045   <span class="keywordflow">return</span>(<span class="keywordtype">id</span> == o.<a class="code" href="classGPixel.html#5838e0e085f8bc6267d57e83732fa10e">id</a> &amp;&amp; fabs(x-o.<a class="code" href="classGPixel.html#7bd069cdb4aa390e7de6fbdd35fd6181">x</a>) &lt; 1e-5 &amp;&amp; fabs(y - o.<a class="code" href="classGPixel.html#fbcc5faf9aed7beb2427625d244b1cf6">y</a>) &lt; 1e-5);
+<a name="l00046"></a>00046 }
+<a name="l00047"></a>00047 
+<a name="l00048"></a>00048 
+<a name="l00051"></a>00051 <span class="keyword">inline</span> <span class="keywordtype">bool</span> GPixel::operator !=(<span class="keyword">const</span> <a class="code" href="classGPixel.html">GPixel</a> &amp;o)<span class="keyword"> const </span>{
+<a name="l00052"></a>00052  <span class="keywordflow">return</span>(!<span class="keyword">operator</span> ==(o));
+<a name="l00053"></a>00053 }
+<a name="l00054"></a>00054 
+<a name="l00055"></a>00055 
+<a name="l00058"></a>00058 <span class="keyword">inline</span> <span class="keywordtype">bool</span> GPixel::operator &lt;(<span class="keyword">const</span> <a class="code" href="classGPixel.html">GPixel</a> &amp;o)<span class="keyword"> const </span>{
+<a name="l00059"></a>00059   <span class="keywordflow">if</span>(<span class="keywordtype">id</span> &lt; o.<a class="code" href="classGPixel.html#5838e0e085f8bc6267d57e83732fa10e">id</a>) <span class="keywordflow">return</span>(<span class="keyword">true</span>);
+<a name="l00060"></a>00060   <span class="keywordflow">if</span>(<span class="keywordtype">id</span> &gt; o.<a class="code" href="classGPixel.html#5838e0e085f8bc6267d57e83732fa10e">id</a>) <span class="keywordflow">return</span>(<span class="keyword">false</span>);
+<a name="l00061"></a>00061   <span class="keywordflow">if</span>(x &lt; o.<a class="code" href="classGPixel.html#7bd069cdb4aa390e7de6fbdd35fd6181">x</a>) <span class="keywordflow">return</span>(<span class="keyword">true</span>);
+<a name="l00062"></a>00062   <span class="keywordflow">if</span>(x &gt; o.<a class="code" href="classGPixel.html#7bd069cdb4aa390e7de6fbdd35fd6181">x</a>) <span class="keywordflow">return</span>(<span class="keyword">false</span>);
+<a name="l00063"></a>00063   <span class="keywordflow">if</span>(y &lt; o.<a class="code" href="classGPixel.html#fbcc5faf9aed7beb2427625d244b1cf6">y</a>) <span class="keywordflow">return</span>(<span class="keyword">true</span>);
+<a name="l00064"></a>00064   <span class="keywordflow">return</span>(<span class="keyword">false</span>);
+<a name="l00065"></a>00065 }
+<a name="l00066"></a>00066 
+<a name="l00067"></a>00067 
+<a name="l00070"></a>00070 <span class="keyword">inline</span> std::ostream &amp;operator &lt;&lt;(std::ostream &amp;out, <span class="keyword">const</span> <a class="code" href="classGPixel.html">GPixel</a> &amp;c) {
+<a name="l00071"></a>00071   out &lt;&lt; <span class="stringliteral">"("</span> &lt;&lt; c.<a class="code" href="classGPixel.html#5838e0e085f8bc6267d57e83732fa10e">id</a> &lt;&lt; <span class="stringliteral">" "</span> 
+<a name="l00072"></a>00072       &lt;&lt; c.<a class="code" href="classGPixel.html#7bd069cdb4aa390e7de6fbdd35fd6181">x</a> &lt;&lt; <span class="stringliteral">" "</span>
+<a name="l00073"></a>00073       &lt;&lt; c.<a class="code" href="classGPixel.html#fbcc5faf9aed7beb2427625d244b1cf6">y</a> &lt;&lt; <span class="stringliteral">")"</span>;
+<a name="l00074"></a>00074   <span class="keywordflow">return</span>(out);
+<a name="l00075"></a>00075 }
+<a name="l00076"></a>00076 
+<a name="l00077"></a>00077 <span class="preprocessor">#endif</span>
 </pre></div></div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Thu Jun 28 14:32:08 2012 for ProCamSolver by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Thu Jun 28 17:48:12 2012 for ProCamSolver by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.6 </small></address>
 </body>

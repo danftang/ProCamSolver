@@ -50,6 +50,8 @@ typedef Base::ColsBlockXpr&nbsp;</td><td class="memItemRight" valign="bottom"><b
 typedef Base::RowsBlockXpr&nbsp;</td><td class="memItemRight" valign="bottom"><b>ViewRef</b></td></tr>
 
 <tr><td colspan="2"><br><h2>Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeasurementMatrix.html#2830b09d0a38fe774ceac57c2436fc25">MeasurementMatrix</a> (const <a class="el" href="classCorrespondenceSet.html">CorrespondenceSet</a> &amp;)</td></tr>
+
 <tr><td class="memItemLeft" nowrap align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeasurementMatrix.html#358011dcd5519fa9fc39a56f9386e964">add_correspondence</a> (const <a class="el" href="classCorrespondence.html">Correspondence</a> &amp;)</td></tr>
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeasurementMatrix.html#01e119caefd759f2b9a2e65ce7c2dcc6">load</a> (const char *)</td></tr>
@@ -107,7 +109,30 @@ template&lt;class D&gt; </td></tr>
 <h3>template&lt;int M&gt;<br>
  class MeasurementMatrix&lt; M &gt;</h3>
 
-Class to represent the measurements of N 3D points from M views. As defined in Sturm, P. and Triggs, B. 1996: A factorization based algorithm for multi-image projective structure and motion. European conference on computer vision, 1996: 709-720. <hr><h2>Member Function Documentation</h2>
+Class to represent the measurements of N 3D points from M views. As defined in Sturm, P. and Triggs, B. 1996: A factorization based algorithm for multi-image projective structure and motion. European conference on computer vision, 1996: 709-720. <hr><h2>Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" name="2830b09d0a38fe774ceac57c2436fc25"></a><!-- doxytag: member="MeasurementMatrix::MeasurementMatrix" ref="2830b09d0a38fe774ceac57c2436fc25" args="(const CorrespondenceSet &amp;)" -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int M&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classMeasurementMatrix.html">MeasurementMatrix</a>&lt; M &gt;::<a class="el" href="classMeasurementMatrix.html">MeasurementMatrix</a>           </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classCorrespondenceSet.html">CorrespondenceSet</a> &amp;&nbsp;</td>
+          <td class="paramname"> <em>corrs</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets *this to contain the given set of corrrespondences. Use this constructor in favour of add_correspondece if you have a large number of correspondences as insertion into a <a class="el" href="classCorrespondenceSet.html">CorrespondenceSet</a> is much quicker. 
+</div>
+</div><p>
+<hr><h2>Member Function Documentation</h2>
 <a class="anchor" name="358011dcd5519fa9fc39a56f9386e964"></a><!-- doxytag: member="MeasurementMatrix::add_correspondence" ref="358011dcd5519fa9fc39a56f9386e964" args="(const Correspondence &amp;)" -->
 <div class="memitem">
 <div class="memproto">
@@ -152,6 +177,11 @@ template&lt;int M&gt; </div>
 
 <p>
 Loads a set of pixel correspondences from a sorted file in the format &lt;id1&gt; &lt;id2&gt; &lt;x1&gt; &lt;y1&gt; &lt;x2&gt; &lt;y2&gt;<p>
+This method assumes that:<p>
+1) The views can be split into projectors and cameras<p>
+2) &lt;id1&gt; is always a projector<p>
+3) There are no direct correspondences between projectors<p>
+4) The file is sorted by projector id and projector pixel coordinate<p>
 where<p>
 id1/2 = id of the projector / camera x1/2, y1/2 = pixel coordinate of the projector / camera 
 </div>
@@ -699,7 +729,7 @@ True if the given view in *this has been fully expanded during formation of a su
 <hr>The documentation for this class was generated from the following files:<ul>
 <li><a class="el" href="MeasurementMatrix_8h-source.html">MeasurementMatrix.h</a><li><a class="el" href="MeasurementMatrix_8hpp-source.html">MeasurementMatrix.hpp</a></ul>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Thu Jun 28 14:32:08 2012 for ProCamSolver by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Thu Jun 28 17:48:12 2012 for ProCamSolver by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.6 </small></address>
 </body>

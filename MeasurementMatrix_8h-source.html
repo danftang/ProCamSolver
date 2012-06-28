@@ -37,60 +37,62 @@
 <a name="l00023"></a>00023 <span class="preprocessor">#include "MotionMatrix.h"</span>
 <a name="l00024"></a>00024 <span class="preprocessor">#include "Correspondence.h"</span>
 <a name="l00025"></a>00025 <span class="preprocessor">#include "ImageTransform.h"</span>
-<a name="l00026"></a>00026 
-<a name="l00033"></a>00033 <span class="keyword">template</span>&lt;<span class="keywordtype">int</span> M&gt;
-<a name="l00034"></a><a class="code" href="classMeasurementMatrix.html">00034</a> <span class="keyword">class </span><a class="code" href="classMeasurementMatrix.html">MeasurementMatrix</a> : <span class="keyword">public</span> Eigen::Matrix&lt;double, 3*M, Eigen::Dynamic&gt; {
-<a name="l00035"></a>00035 <span class="keyword">public</span>:
-<a name="l00036"></a>00036   <span class="keyword">typedef</span> Eigen::Matrix&lt;double, 3*M,Eigen::Dynamic&gt;             Base;
-<a name="l00037"></a>00037   <span class="keyword">typedef</span> <span class="keyword">typename</span> Eigen::Block&lt;Base,3,1&gt;                       PixelRef;
-<a name="l00038"></a>00038   <span class="keyword">typedef</span> <span class="keyword">const</span> <span class="keyword">typename</span> Eigen::Block&lt;const Base,3,1&gt;           constPixelRef;
-<a name="l00039"></a>00039   <span class="keyword">typedef</span> <span class="keyword">typename</span> Base::ColXpr                                 ColXpr;
-<a name="l00040"></a>00040   <span class="keyword">typedef</span> <span class="keyword">typename</span> Base::ColsBlockXpr                           ColsBlockXpr;
-<a name="l00041"></a>00041   <span class="keyword">typedef</span> <span class="keyword">typename</span> Base::RowsBlockXpr                           ViewRef;
-<a name="l00042"></a>00042   <span class="keyword">using</span> Base::col;
-<a name="l00043"></a>00043   <span class="keyword">using</span> Base::row;
-<a name="l00044"></a>00044   <span class="keyword">using</span> Base::cols;
-<a name="l00045"></a>00045   <span class="keyword">using</span> Base::rows;
-<a name="l00046"></a>00046   <span class="keyword">using</span> Base::middleRows;
-<a name="l00047"></a>00047   <span class="keyword">using</span> Base::middleCols;
-<a name="l00048"></a>00048 
-<a name="l00049"></a>00049   <a class="code" href="classMeasurementMatrix.html">MeasurementMatrix</a>()                                           {}
-<a name="l00050"></a>00050   <span class="keywordtype">int</span>   <a class="code" href="classMeasurementMatrix.html#358011dcd5519fa9fc39a56f9386e964">add_correspondence</a>(<span class="keyword">const</span> <a class="code" href="classCorrespondence.html">Correspondence</a> &amp;);
-<a name="l00051"></a>00051   <span class="keywordtype">bool</span>  <a class="code" href="classMeasurementMatrix.html#01e119caefd759f2b9a2e65ce7c2dcc6">load</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *);
-<a name="l00052"></a>00052   <span class="keywordtype">void</span>  <a class="code" href="classMeasurementMatrix.html#9823bc472bb1e95a7019af8d2c2782a7">normalise</a>(<a class="code" href="classImageTransform.html">ImageTransform&lt;M&gt;</a> &amp;, <span class="keywordtype">bool</span> fixedAspect=<span class="keyword">false</span>);
-<a name="l00053"></a>00053   <span class="keywordtype">void</span>  <a class="code" href="classMeasurementMatrix.html#50bb8f66a31065040fd1be6964fbfe5e">unscale</a>();
-<a name="l00054"></a>00054   <span class="keywordtype">void</span>  <a class="code" href="classMeasurementMatrix.html#17df03814e515221ffafb893c47e70e7">scale_and_fill</a>(<span class="keyword">const</span> <a class="code" href="classMotionMatrix.html">MotionMatrix&lt;M&gt;</a> &amp;, <span class="keyword">const</span> <a class="code" href="classShapeMatrix.html">ShapeMatrix</a> &amp;);
-<a name="l00055"></a>00055   <span class="keywordtype">void</span>  <a class="code" href="classMeasurementMatrix.html#a1d9a47c20c0e2da3d09a1cfa64eddb5">synthesise_measurements</a>(<span class="keyword">const</span> <a class="code" href="classMotionMatrix.html">MotionMatrix&lt;M&gt;</a> &amp;, <span class="keywordtype">int</span>, <span class="keywordtype">double</span>);
-<a name="l00056"></a>00056   <span class="keywordtype">void</span>  <a class="code" href="classMeasurementMatrix.html#f85e926f3c754f12ef699dc9a0961e47">synthesise_occlusions</a>(<span class="keywordtype">double</span>);
-<a name="l00057"></a>00057   <span class="keywordtype">void</span>  order_cols_by_occlusions();
-<a name="l00058"></a>00058   
-<a name="l00059"></a>00059   PixelRef      <a class="code" href="classMeasurementMatrix.html#976bed12b8bacb9648d8e0e3265c2968">pixel</a>(<span class="keywordtype">int</span>,<span class="keywordtype">int</span>);
-<a name="l00060"></a>00060   constPixelRef <a class="code" href="classMeasurementMatrix.html#976bed12b8bacb9648d8e0e3265c2968">pixel</a>(<span class="keywordtype">int</span>,<span class="keywordtype">int</span>) <span class="keyword">const</span>;
-<a name="l00061"></a>00061   <span class="keywordtype">bool</span>          <a class="code" href="classMeasurementMatrix.html#a5f1f98d7fc2d7862be7c2309fafb7b2">pixel_is_occluded</a>(<span class="keywordtype">int</span>,<span class="keywordtype">int</span>) <span class="keyword">const</span>;
-<a name="l00062"></a>00062   ViewRef       <a class="code" href="classMeasurementMatrix.html#dadbcfb5d897ec52ed11d5c5eda59855">view</a>(<span class="keywordtype">int</span>);
-<a name="l00063"></a>00063   
-<a name="l00064"></a>00064   <span class="keywordtype">void</span>  <a class="code" href="classMeasurementMatrix.html#c66ccaf22bcef4e339ffe9d6c98a103b">insert_pixel</a>(<span class="keywordtype">int</span>, <span class="keyword">const</span> <a class="code" href="classGPixel.html">GPixel</a> &amp;);
-<a name="l00065"></a>00065   <span class="keywordtype">void</span>  <a class="code" href="classMeasurementMatrix.html#e6dc25c2b3aa8eeab7b19dfc36d87051">merge_columns</a>(<span class="keywordtype">int</span>, <span class="keywordtype">int</span>);
-<a name="l00066"></a>00066   <span class="keywordtype">int</span>   <a class="code" href="classMeasurementMatrix.html#a93cbb8a0ae1936a512a9fd93ed149af">new_column</a>();
-<a name="l00067"></a>00067   <span class="keywordtype">int</span>   <a class="code" href="classMeasurementMatrix.html#05d194eb20237c7c874213c74819754b">new_columns</a>(<span class="keywordtype">int</span>);
-<a name="l00068"></a>00068   <span class="keywordtype">int</span>   <a class="code" href="classMeasurementMatrix.html#ca516a2d496e1a22cdaa78a88b13c594">insert_columns</a>(ColsBlockXpr);
-<a name="l00069"></a>00069   <span class="keywordtype">int</span>   <a class="code" href="classMeasurementMatrix.html#94d0b0016f655ffd1b395db41ebe1a59">insert_column_and_expand</a>(ColXpr);
-<a name="l00070"></a>00070   <span class="keywordtype">void</span>  <a class="code" href="classMeasurementMatrix.html#c9e4c50f0453460de208067444dcf4cb">delete_column</a>(<span class="keywordtype">int</span>);
-<a name="l00071"></a>00071   <span class="keywordtype">void</span>  <a class="code" href="classMeasurementMatrix.html#0052401400707b803be18b5334f6d699">delete_columns</a>(<span class="keywordtype">int</span>,<span class="keywordtype">int</span>);
-<a name="l00072"></a>00072   <span class="keywordtype">int</span>   <a class="code" href="classMeasurementMatrix.html#fd158fb3e361a3437aa4f04d36bc2fc2">column_containing</a>(<span class="keyword">const</span> <a class="code" href="classGPixel.html">GPixel</a> &amp;);
-<a name="l00073"></a>00073   <span class="keywordtype">int</span>   <a class="code" href="classMeasurementMatrix.html#c7fe1b3d19b2186f10847a51d17d66ec">rank</a>(<span class="keywordtype">double</span> = 0.0);
-<a name="l00074"></a>00074   <span class="keywordtype">bool</span>  <a class="code" href="classMeasurementMatrix.html#1fd2d5bcf0da4f91f14f05fea1394072">is_fully_expanded</a>(<span class="keywordtype">int</span>);
-<a name="l00075"></a>00075 
-<a name="l00076"></a>00076   <span class="keyword">template</span>&lt;<span class="keyword">class</span> D&gt;
-<a name="l00077"></a>00077   <a class="code" href="classMeasurementMatrix.html">MeasurementMatrix</a> &amp;operator=(<span class="keyword">const</span> Eigen::MatrixBase&lt;D&gt; &amp;);
-<a name="l00078"></a>00078   
-<a name="l00079"></a>00079 };
-<a name="l00080"></a>00080 
-<a name="l00081"></a>00081 <span class="preprocessor">#include "MeasurementMatrix.hpp"</span>
+<a name="l00026"></a>00026 <span class="preprocessor">#include "CorrespondenceSet.h"</span>
+<a name="l00027"></a>00027 
+<a name="l00034"></a>00034 <span class="keyword">template</span>&lt;<span class="keywordtype">int</span> M&gt;
+<a name="l00035"></a><a class="code" href="classMeasurementMatrix.html">00035</a> <span class="keyword">class </span><a class="code" href="classMeasurementMatrix.html">MeasurementMatrix</a> : <span class="keyword">public</span> Eigen::Matrix&lt;double, 3*M, Eigen::Dynamic&gt; {
+<a name="l00036"></a>00036 <span class="keyword">public</span>:
+<a name="l00037"></a>00037   <span class="keyword">typedef</span> Eigen::Matrix&lt;double, 3*M,Eigen::Dynamic&gt;             Base;
+<a name="l00038"></a>00038   <span class="keyword">typedef</span> <span class="keyword">typename</span> Eigen::Block&lt;Base,3,1&gt;                       PixelRef;
+<a name="l00039"></a>00039   <span class="keyword">typedef</span> <span class="keyword">const</span> <span class="keyword">typename</span> Eigen::Block&lt;const Base,3,1&gt;           constPixelRef;
+<a name="l00040"></a>00040   <span class="keyword">typedef</span> <span class="keyword">typename</span> Base::ColXpr                                 ColXpr;
+<a name="l00041"></a>00041   <span class="keyword">typedef</span> <span class="keyword">typename</span> Base::ColsBlockXpr                           ColsBlockXpr;
+<a name="l00042"></a>00042   <span class="keyword">typedef</span> <span class="keyword">typename</span> Base::RowsBlockXpr                           ViewRef;
+<a name="l00043"></a>00043   <span class="keyword">using</span> Base::col;
+<a name="l00044"></a>00044   <span class="keyword">using</span> Base::row;
+<a name="l00045"></a>00045   <span class="keyword">using</span> Base::cols;
+<a name="l00046"></a>00046   <span class="keyword">using</span> Base::rows;
+<a name="l00047"></a>00047   <span class="keyword">using</span> Base::middleRows;
+<a name="l00048"></a>00048   <span class="keyword">using</span> Base::middleCols;
+<a name="l00049"></a>00049 
+<a name="l00050"></a>00050   <a class="code" href="classMeasurementMatrix.html">MeasurementMatrix</a>()                                           {}
+<a name="l00051"></a>00051   <a class="code" href="classMeasurementMatrix.html">MeasurementMatrix</a>(<span class="keyword">const</span> <a class="code" href="classCorrespondenceSet.html">CorrespondenceSet</a> &amp;);
+<a name="l00052"></a>00052   <span class="keywordtype">int</span>   <a class="code" href="classMeasurementMatrix.html#358011dcd5519fa9fc39a56f9386e964">add_correspondence</a>(<span class="keyword">const</span> <a class="code" href="classCorrespondence.html">Correspondence</a> &amp;);
+<a name="l00053"></a>00053   <span class="keywordtype">bool</span>  <a class="code" href="classMeasurementMatrix.html#01e119caefd759f2b9a2e65ce7c2dcc6">load</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *);
+<a name="l00054"></a>00054   <span class="keywordtype">void</span>  <a class="code" href="classMeasurementMatrix.html#9823bc472bb1e95a7019af8d2c2782a7">normalise</a>(<a class="code" href="classImageTransform.html">ImageTransform&lt;M&gt;</a> &amp;, <span class="keywordtype">bool</span> fixedAspect=<span class="keyword">false</span>);
+<a name="l00055"></a>00055   <span class="keywordtype">void</span>  <a class="code" href="classMeasurementMatrix.html#50bb8f66a31065040fd1be6964fbfe5e">unscale</a>();
+<a name="l00056"></a>00056   <span class="keywordtype">void</span>  <a class="code" href="classMeasurementMatrix.html#17df03814e515221ffafb893c47e70e7">scale_and_fill</a>(<span class="keyword">const</span> <a class="code" href="classMotionMatrix.html">MotionMatrix&lt;M&gt;</a> &amp;, <span class="keyword">const</span> <a class="code" href="classShapeMatrix.html">ShapeMatrix</a> &amp;);
+<a name="l00057"></a>00057   <span class="keywordtype">void</span>  <a class="code" href="classMeasurementMatrix.html#a1d9a47c20c0e2da3d09a1cfa64eddb5">synthesise_measurements</a>(<span class="keyword">const</span> <a class="code" href="classMotionMatrix.html">MotionMatrix&lt;M&gt;</a> &amp;, <span class="keywordtype">int</span>, <span class="keywordtype">double</span>);
+<a name="l00058"></a>00058   <span class="keywordtype">void</span>  <a class="code" href="classMeasurementMatrix.html#f85e926f3c754f12ef699dc9a0961e47">synthesise_occlusions</a>(<span class="keywordtype">double</span>);
+<a name="l00059"></a>00059   <span class="keywordtype">void</span>  order_cols_by_occlusions();
+<a name="l00060"></a>00060   
+<a name="l00061"></a>00061   PixelRef      <a class="code" href="classMeasurementMatrix.html#976bed12b8bacb9648d8e0e3265c2968">pixel</a>(<span class="keywordtype">int</span>,<span class="keywordtype">int</span>);
+<a name="l00062"></a>00062   constPixelRef <a class="code" href="classMeasurementMatrix.html#976bed12b8bacb9648d8e0e3265c2968">pixel</a>(<span class="keywordtype">int</span>,<span class="keywordtype">int</span>) <span class="keyword">const</span>;
+<a name="l00063"></a>00063   <span class="keywordtype">bool</span>          <a class="code" href="classMeasurementMatrix.html#a5f1f98d7fc2d7862be7c2309fafb7b2">pixel_is_occluded</a>(<span class="keywordtype">int</span>,<span class="keywordtype">int</span>) <span class="keyword">const</span>;
+<a name="l00064"></a>00064   ViewRef       <a class="code" href="classMeasurementMatrix.html#dadbcfb5d897ec52ed11d5c5eda59855">view</a>(<span class="keywordtype">int</span>);
+<a name="l00065"></a>00065   
+<a name="l00066"></a>00066   <span class="keywordtype">void</span>  <a class="code" href="classMeasurementMatrix.html#c66ccaf22bcef4e339ffe9d6c98a103b">insert_pixel</a>(<span class="keywordtype">int</span>, <span class="keyword">const</span> <a class="code" href="classGPixel.html">GPixel</a> &amp;);
+<a name="l00067"></a>00067   <span class="keywordtype">void</span>  <a class="code" href="classMeasurementMatrix.html#e6dc25c2b3aa8eeab7b19dfc36d87051">merge_columns</a>(<span class="keywordtype">int</span>, <span class="keywordtype">int</span>);
+<a name="l00068"></a>00068   <span class="keywordtype">int</span>   <a class="code" href="classMeasurementMatrix.html#a93cbb8a0ae1936a512a9fd93ed149af">new_column</a>();
+<a name="l00069"></a>00069   <span class="keywordtype">int</span>   <a class="code" href="classMeasurementMatrix.html#05d194eb20237c7c874213c74819754b">new_columns</a>(<span class="keywordtype">int</span>);
+<a name="l00070"></a>00070   <span class="keywordtype">int</span>   <a class="code" href="classMeasurementMatrix.html#ca516a2d496e1a22cdaa78a88b13c594">insert_columns</a>(ColsBlockXpr);
+<a name="l00071"></a>00071   <span class="keywordtype">int</span>   <a class="code" href="classMeasurementMatrix.html#94d0b0016f655ffd1b395db41ebe1a59">insert_column_and_expand</a>(ColXpr);
+<a name="l00072"></a>00072   <span class="keywordtype">void</span>  <a class="code" href="classMeasurementMatrix.html#c9e4c50f0453460de208067444dcf4cb">delete_column</a>(<span class="keywordtype">int</span>);
+<a name="l00073"></a>00073   <span class="keywordtype">void</span>  <a class="code" href="classMeasurementMatrix.html#0052401400707b803be18b5334f6d699">delete_columns</a>(<span class="keywordtype">int</span>,<span class="keywordtype">int</span>);
+<a name="l00074"></a>00074   <span class="keywordtype">int</span>   <a class="code" href="classMeasurementMatrix.html#fd158fb3e361a3437aa4f04d36bc2fc2">column_containing</a>(<span class="keyword">const</span> <a class="code" href="classGPixel.html">GPixel</a> &amp;);
+<a name="l00075"></a>00075   <span class="keywordtype">int</span>   <a class="code" href="classMeasurementMatrix.html#c7fe1b3d19b2186f10847a51d17d66ec">rank</a>(<span class="keywordtype">double</span> = 0.0);
+<a name="l00076"></a>00076   <span class="keywordtype">bool</span>  <a class="code" href="classMeasurementMatrix.html#1fd2d5bcf0da4f91f14f05fea1394072">is_fully_expanded</a>(<span class="keywordtype">int</span>);
+<a name="l00077"></a>00077 
+<a name="l00078"></a>00078   <span class="keyword">template</span>&lt;<span class="keyword">class</span> D&gt;
+<a name="l00079"></a>00079   <a class="code" href="classMeasurementMatrix.html">MeasurementMatrix</a> &amp;operator=(<span class="keyword">const</span> Eigen::MatrixBase&lt;D&gt; &amp;);
+<a name="l00080"></a>00080   
+<a name="l00081"></a>00081 };
 <a name="l00082"></a>00082 
-<a name="l00083"></a>00083 <span class="preprocessor">#endif</span>
+<a name="l00083"></a>00083 <span class="preprocessor">#include "MeasurementMatrix.hpp"</span>
+<a name="l00084"></a>00084 
+<a name="l00085"></a>00085 <span class="preprocessor">#endif</span>
 </pre></div></div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Thu Jun 28 14:32:08 2012 for ProCamSolver by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Thu Jun 28 17:48:12 2012 for ProCamSolver by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.6 </small></address>
 </body>

@@ -13,3 +13,5 @@
 \form#12:\[ S = \left( \begin{array}{ccc} */ x_{0} & \cdots & x_{N}\ y_{0} & \cdots & y_{N} \ z_0 & \cdots & z_N \ 1 & \cdots & 1 \ /**\end{array} \right) \]
 \form#13:\[ S = \left( \begin{array}{ccc} x_0 & \cdots & x_N\\ y_0 & \cdots & y_N\\ z_0 & \cdots & z_N\\ 1 & \cdots & 1 \\ \end{array} \right) \]
 \form#14:\[ P = \left( \begin{array}{c} P_0 \\ P_1 \\ \vdots \\ P_M \end{array} \right) \]
+\form#15:$1 \times 10^{-5}$
+\form#16:$(0,0,0)^T$
