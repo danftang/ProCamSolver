@@ -18,8 +18,44 @@
 
 
 ///////////////////////////////////////////////////////////////////////////////
+/// Sets *this to contain the given set of corrrespondences. Use this
+/// constructor in favour of add_correspondece if you have a large number
+/// of correspondences as insertion into a CorrespondenceSet is much
+/// quicker.
+///////////////////////////////////////////////////////////////////////////////
+template<int M>
+MeasurementMatrix<M>::MeasurementMatrix(const CorrespondenceSet &corrs) {
+  CorrespondenceSet::const_iterator cSet;
+  CorrespondenceSet::EquivalenceClass::const_iterator setMember;
+  int j;
+  Base::resize(corrs.size());
+  Base::setZero();
+  
+  j = 0;
+  for(cSet = corrs.begin(); cSet != corrs.end(); ++cSet) {
+    for(setMember = cSet->begin(); setMember != cSet->end(); ++setMember) {
+      pixel(setMember->id, j)(0) = setMember->x;
+      pixel(setMember->id, j)(1) = setMember->y;
+      pixel(setMember->id, j)(2) = 1.0;
+    }
+    ++j;
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 /// Loads a set of pixel correspondences from a sorted file in the format
 ///  <id1> <id2> <x1> <y1> <x2> <y2>
+///
+/// This method assumes that:
+/// 
+/// 1) The views can be split into projectors and cameras
+///
+/// 2) <id1> is always a projector
+///
+/// 3) There are no direct correspondences between projectors
+///
+/// 4) The file is sorted by projector id and projector pixel coordinate
 ///
 /// where
 ///

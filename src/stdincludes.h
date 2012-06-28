@@ -9,6 +9,7 @@
 #include <unsupported/Eigen/NonLinearOptimization>
 #include <fstream>
 #include <vector>
+#include <set>
 #include <iostream>
 #include <cmath>
 #include <limits>

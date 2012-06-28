@@ -23,6 +23,7 @@
 #include "MotionMatrix.h"
 #include "Correspondence.h"
 #include "ImageTransform.h"
+#include "CorrespondenceSet.h"
 
 //////////////////////////////////////////////////////////////////////////////
 /// Class to represent the measurements of N 3D points from M views.
@@ -47,6 +48,7 @@ public:
   using Base::middleCols;
 
   MeasurementMatrix()				 		{}
+  MeasurementMatrix(const CorrespondenceSet &);
   int	add_correspondence(const Correspondence &);
   bool	load(const char *);
   void	normalise(ImageTransform<M> &, bool fixedAspect=false);

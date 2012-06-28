@@ -38,6 +38,8 @@ public:
 
 
 ///////////////////////////////////////////////////////////////////////////////
+/// WARNING: Two GPixels are equal if their ids are equal and their
+/// coordinates differ by less than \f$1 \times 10^{-5}\f$.
 ///////////////////////////////////////////////////////////////////////////////
 inline bool GPixel::operator ==(const GPixel &o) const {
   return(id == o.id && fabs(x-o.x) < 1e-5 && fabs(y - o.y) < 1e-5);
