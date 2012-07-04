@@ -78,12 +78,15 @@ typename MotionMatrix<V>::constBlock31 MotionMatrix<V>::T(int v) const {
 ///
 /// 1) Calculate projective depths from the Fundamental matrices
 /// (Sturm and Triggs 1996)
+///   - Apply a constant lambda as the Projective Depth per pixel (different lamba per pixel). We apply lambda to as many pixels as possible. This is applied cumulatively through the views which are linked together in the Spanning Tree.
 ///
 /// 2) Approximate the shape/motion matrices using method of Martinec
 /// and Pajdla (2002)
 ///
 /// 3) Use the approximate motion matrix to fill in occlusions and
 /// unknown projective depths
+///   - Fill in the holes in the MotionMatrix
+///   - Apply lambda weights to pixels that we couldn't do so before
 ///
 /// 4) Take Singular Value Decomposition to factorise into
 /// shape/motion matrices
