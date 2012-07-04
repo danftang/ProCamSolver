@@ -53,9 +53,13 @@ Implement RANSAC into FundamentalMatrix class which will solve against subsets o
 
 RANSAC is best performed on step 1 (Fundamental Matrix) of [here](http://danftang.github.com/ProCamSolver/classMotionMatrix.html#5a07d5b1459cb42e191a3892c9c122ea). Svoboda et al (A Convenient Multi-Camera Self-Calibration for Virtual Environment) also perform this on the other steps
 
-## Better sparse matrix 
+## Better sparse matrix methods
 
 With large datasets, we should be selecting a good subset to work with which is an involved process. A strategy would need to be made to find the best way of summarising the data without losing important features.
+
+## Use the sparse matrix in the bundle adjustment
+
+Currently we're filling occlusions before this stage by simulating the 3d points.
 
 ## Standalone app
 
